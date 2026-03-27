@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>預約系統</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --primary:#22c55e;
+      --secondary:#38bdf8;
+      --danger:#ef4444;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+    body{
+      margin:0;
+      min-height:100svh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(2,6,23,.85);
+      backdrop-filter: blur(10px);
+      padding:12px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    header h1{
+      font-size:16px;
+      margin:0;
+      font-weight:700;
+    }
+
+    .nav button{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.2);
+      background:none;
+      color:var(--text);
+      font-size:14px;
+    }
+
+    .nav button.active{
+      background:var(--secondary);
+      color:#020617;
+    }
+
+    main{
+      padding:16px;
+    }
+
+    .card{
+      background:var(--panel);
+      border-radius:var(--radius);
+      padding:16px;
+      margin-bottom:16px;
+    }
+
+    .display{
+      text-align:center;
+    }
+
+    .display .label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .display .now{
+      font-size:72px;
+      font-weight:900;
+      letter-spacing:4px;
+      margin:8px 0 16px;
+    }
+
+    .queue{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .badge{
+      padding:12px 24px;
+      min-width:60px;
+      text-align:center;
+      border-radius:999px;
+      background:#020617;
+      border:1px solid rgba(255,255,255,.15);
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .login input{
+      width:100%;
+      padding:14px;
+      font-size:16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.2);
+      background:#020617;
+      color:var(--text);
+    }
+
+    .login button{
+      width:100%;
+      margin-top:12px;
+      padding:14px;
+      font-size:16px;
+      font-weight:700;
+      border-radius:12px;
+      border:none;
+      background:var(--secondary);
+      color:#020617;
+    }
+
+    .error{
+      color:var(--danger);
+      margin-top:8px
+    }
+
+    .counter-actions{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    .btn{
+      padding:18px;
+      font-size:18px;
+      font-weight:800;
+      border-radius:14px;
+      border:none;
+      box-shadow: 0 6px 16px rgba(0,0,0,.3);
+    }
+
+    .btn.primary{background:var(--primary);color:#052e16}
+    .btn.secondary{background:var(--secondary);color:#020617}
+    .btn.danger{background:var(--danger);color:#020617}
+
+    .stats{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .stat{
+      background:#020617;
+      border-radius:12px;
+      padding:12px;
+      text-align:center;
+    }
+
+    .stat h3{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .stat p{
+      margin:6px 0 0;
+      font-size:24px;
+      font-weight:800;
+    }
+
+    footer{
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      padding:16px 0 24px;
+    }
+
+    @media (min-width:768px){
+      main{max-width:900px;margin:auto}
+      .display .now{font-size:96px}
+      .queue{grid-template-columns:repeat(6,1fr)}
+      .counter-actions{grid-template-columns:repeat(3,1fr)}
+      .stats{grid-template-columns:repeat(3,1fr)}
+    }
+
+    button{
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        filter 0.15s ease;
+      cursor: pointer;
+    }
+
+    button:hover{
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      filter: brightness(1.05);
+    }
+
+    button:active{
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 3px 8px rgba(0,0,0,.4);
+      filter: brightness(0.95);
+    }
+
+    .nav button:active{
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>預約系統</h1>
+    <div class="nav">
+      <button id="nav-display" class="active">顯示</button>
+      <button id="nav-counter">櫃檯</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="page-display" class="card display">
+      <div class="label">目前叫號</div>
+      <div id="nowNumber" class="now">—</div>
+
+      <div class="label">等待中</div>
+      <div id="waitingList" class="queue"></div>
+    </section>
+
+    <section id="page-login" class="card login" style="display:none">
+      <input id="password" type="password" placeholder="請輸入櫃檯密碼">
+      <button id="loginBtn">登入櫃檯</button>
+      <div id="loginError" class="error"></div>
+    </section>
+
+    <section id="page-counter" class="card" style="display:none">
+      <div class="counter-actions">
+        <button id="addNumber" class="btn primary">新增號碼</button>
+        <button id="callNext" class="btn secondary">叫下一號</button>
+        <button id="resetAll" class="btn danger">全部重置</button>
+      </div>
+
+      <div class="card">
+        <h3>刪除等待中的號碼</h3>
+        <input id="deleteNumber" type="number" placeholder="輸入要刪除的號碼">
+        <button id="deleteNumberBtn" class="btn danger">刪除號碼</button>
+      </div>
+
+      <div class="card">
+        <h3>回復誤刪的號碼</h3>
+        <input id="restoreNumber" type="number" placeholder="輸入要回復的號碼">
+        <button id="restoreNumberBtn" class="btn primary">回復號碼</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <h3>目前叫號</h3>
+          <p id="statCurrent">—</p>
+        </div>
+        <div class="stat">
+          <h3>等待人數</h3>
+          <p id="statWaiting">0</p>
+        </div>
+        <div class="stat">
+          <h3>最後號碼</h3>
+          <p id="statLast">0</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+  let adminToken = '';
+
+  const state = {
+    current: null,
+    last: 0,
+    queue: [],
+    called: []
+  };
+
+  function render() {
+    document.getElementById('nowNumber').textContent = state.current ?? '—';
+    document.getElementById('statCurrent').textContent = state.current ?? '—';
+    document.getElementById('statWaiting').textContent = state.queue.length;
+    document.getElementById('statLast').textContent = state.last;
+
+    const list = document.getElementById('waitingList');
+    list.innerHTML = '';
+
+    if (state.queue.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'badge';
+      empty.textContent = '等待中…';
+      list.appendChild(empty);
+    } else {
+      state.queue.slice(0, 6).forEach((n, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.alignItems = 'center';
+
+        if (index < 3) {
+          const timeLabel = document.createElement('div');
+          let seconds = (index + 1) * 30;
+          let minutes = Math.floor(seconds / 60);
+          let sec = seconds % 60;
+          timeLabel.textContent = `預計於 ${minutes > 0 ? minutes + '分' : ''}${sec > 0 ? sec + '秒' : ''}`;
+          timeLabel.style.fontSize = '12px';
+          timeLabel.style.color = '#ef4444';
+          timeLabel.style.marginBottom = '4px';
+          wrapper.appendChild(timeLabel);
+        }
+
+        const b = document.createElement('div');
+        b.className = 'badge';
+        b.textContent = n;
+
+        if (index < 3) {
+          b.style.background = '#ef4444';
+          b.style.color = '#020617';
+        }
+
+        wrapper.appendChild(b);
+        list.appendChild(wrapper);
+      });
+    }
+  }
+
+  async function loadState() {
+    try {
+      const res = await fetch('http://localhost:3000/api/state');
+      const data = await res.json();
+      Object.assign(state, data);
+      render();
+    } catch (error) {
+      console.error(error);
+      alert('讀取狀態失敗，請確認後端有開著');
+    }
+  }
+
+  const pageDisplay = document.getElementById('page-display');
+  const pageLogin = document.getElementById('page-login');
+  const pageCounter = document.getElementById('page-counter');
+
+  function show(p) {
+    pageDisplay.style.display = 'none';
+    pageLogin.style.display = 'none';
+    pageCounter.style.display = 'none';
+    p.style.display = 'block';
+  }
+
+  document.getElementById('nav-display').onclick = () => show(pageDisplay);
+  document.getElementById('nav-counter').onclick = () => show(pageLogin);
+
+  document.getElementById('loginBtn').onclick = async () => {
+    const password = document.getElementById('password').value;
+    const loginError = document.getElementById('loginError');
+
+    loginError.textContent = '';
+
+    try {
+      const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        adminToken = data.token;
+        document.getElementById('password').value = '';
+        show(pageCounter);
+      } else {
+        loginError.textContent = data.message || '密碼錯誤';
+      }
+    } catch (error) {
+      console.error(error);
+      loginError.textContent = '無法連線到後端';
+    }
+  };
+
+  function authHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${adminToken}`
+    };
+  }
+
+  function handleUnauthorized(data) {
+    if (data && data.message === '未授權，請先登入') {
+      adminToken = '';
+      show(pageLogin);
+      document.getElementById('loginError').textContent = '請重新登入';
+      return true;
+    }
+    return false;
+  }
+
+  document.getElementById('addNumber').onclick = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/api/add-number', {
+        method: 'POST',
+        headers: authHeaders()
+      });
+
+      const data = await res.json();
+
+      if (handleUnauthorized(data)) return;
+
+      if (res.ok && data.success) {
+        Object.assign(state, data.state);
+        render();
+      } else {
+        alert(data.message || '新增失敗');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('無法連線到後端');
+    }
+  };
+
+  document.getElementById('callNext').onclick = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/api/call-next', {
+        method: 'POST',
+        headers: authHeaders()
+      });
+
+      const data = await res.json();
+
+      if (handleUnauthorized(data)) return;
+
+      if (res.ok && data.success) {
+        Object.assign(state, data.state);
+        render();
+      } else {
+        alert(data.message || '叫號失敗');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('無法連線到後端');
+    }
+  };
+
+  document.getElementById('resetAll').onclick = async () => {
+    if (!confirm('確定全部重置？')) return;
+
+    try {
+      const res = await fetch('http://localhost:3000/api/reset', {
+        method: 'POST',
+        headers: authHeaders()
+      });
+
+      const data = await res.json();
+
+      if (handleUnauthorized(data)) return;
+
+      if (res.ok && data.success) {
+        Object.assign(state, data.state);
+        render();
+      } else {
+        alert(data.message || '重置失敗');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('無法連線到後端');
+    }
+  };
+
+  document.getElementById('deleteNumberBtn').onclick = async () => {
+    const input = document.getElementById('deleteNumber');
+    const n = parseInt(input.value);
+
+    if (isNaN(n)) {
+      alert('請輸入號碼');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/delete-number', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ number: n })
+      });
+
+      const data = await res.json();
+
+      if (handleUnauthorized(data)) return;
+
+      if (res.ok && data.success) {
+        Object.assign(state, data.state);
+        render();
+        input.value = '';
+        input.blur();
+      } else {
+        alert(data.message || '刪除失敗');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('無法連線到後端');
+    }
+  };
+
+  document.getElementById('restoreNumberBtn').onclick = async () => {
+    const input = document.getElementById('restoreNumber');
+    const n = parseInt(input.value);
+
+    if (isNaN(n)) {
+      alert('請輸入號碼');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/restore-number', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ number: n })
+      });
+
+      const data = await res.json();
+
+      if (handleUnauthorized(data)) return;
+
+      if (res.ok && data.success) {
+        Object.assign(state, data.state);
+        render();
+        input.value = '';
+        input.blur();
+      } else {
+        alert(data.message || '回復失敗');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('無法連線到後端');
+    }
+  };
+
+  loadState();
+</script>
+</body>
+</html>

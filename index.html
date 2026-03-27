@@ -190,14 +190,25 @@
     if (apiParam) localStorage.setItem("apiBaseUrl", apiParam);
     const API_BASE = localStorage.getItem("apiBaseUrl") || "http://localhost:3000";
     const tabs = [...document.querySelectorAll(".tab")];
-    const state = { token: localStorage.getItem("adminToken") || "", products: [], orders: [], calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] }, stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] } };
+    localStorage.removeItem("adminToken");
+    const state = { token: "", products: [], orders: [], calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] }, stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] } };
     const publicState = { currentPickupNumber: null, waitingPickupNumbers: [] };
     const cart = new Map();
     let timer = null;
 
+    const protectedViews = new Set(["counterView", "kitchenView", "manageView"]);
+
     tabs.forEach(tab => tab.onclick = () => {
+      const targetView = tab.dataset.view;
+      if (protectedViews.has(targetView) && !state.token) {
+        gate(false, "請先登入櫃台帳號");
+        tabs.forEach(item => item.classList.toggle("active", item.dataset.view === "displayView"));
+        document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === "displayView"));
+        return;
+      }
+
       tabs.forEach(item => item.classList.toggle("active", item === tab));
-      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === tab.dataset.view));
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === targetView));
     });
 
     const $ = id => document.getElementById(id);
@@ -234,6 +245,11 @@
       $("manageContent").style.display = isIn ? "block" : "none";
       $("loginStateText").textContent = isIn ? "已登入" : "尚未登入";
       $("loginMessage").textContent = msg;
+      tabs.forEach(tab => {
+        if (protectedViews.has(tab.dataset.view)) {
+          tab.style.opacity = isIn ? "1" : "0.45";
+        }
+      });
     }
 
     function drawPublic() {
@@ -411,7 +427,6 @@
       try {
         const data = await req("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: $("passwordInput").value }) });
         state.token = data.token;
-        localStorage.setItem("adminToken", data.token);
         $("passwordInput").value = "";
         await loadAdmin();
       } catch (error) { gate(false, error.message); }

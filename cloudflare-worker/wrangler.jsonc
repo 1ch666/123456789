@@ -1,0 +1,24 @@
+{
+  "name": "counter-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-28",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "COUNTER",
+        "class_name": "CounterState"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "CounterState"
+      ]
+    }
+  ],
+  "vars": {
+    "CORS_ORIGIN": "*"
+  }
+}

@@ -1,5 +1,8 @@
 server/.env
 server/node_modules/
+cloudflare-worker/.dev.vars
+cloudflare-worker/.wrangler/
+node_modules/
 *.log
 Thumbs.db
 .DS_Store

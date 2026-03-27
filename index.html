@@ -2,550 +2,445 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>預約系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飲料冰品店點餐系統</title>
   <style>
-    :root{
-      --bg:#0f172a;
-      --panel:#111827;
-      --primary:#22c55e;
-      --secondary:#38bdf8;
-      --danger:#ef4444;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --radius:14px;
-    }
-
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
-    body{
-      margin:0;
-      min-height:100svh;
-      background:var(--bg);
-      color:var(--text);
-      font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;
-    }
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:10;
-      background:rgba(2,6,23,.85);
-      backdrop-filter: blur(10px);
-      padding:12px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-
-    header h1{
-      font-size:16px;
-      margin:0;
-      font-weight:700;
-    }
-
-    .nav button{
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.2);
-      background:none;
-      color:var(--text);
-      font-size:14px;
-    }
-
-    .nav button.active{
-      background:var(--secondary);
-      color:#020617;
-    }
-
-    main{
-      padding:16px;
-    }
-
-    .card{
-      background:var(--panel);
-      border-radius:var(--radius);
-      padding:16px;
-      margin-bottom:16px;
-    }
-
-    .display{
-      text-align:center;
-    }
-
-    .display .label{
-      font-size:14px;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
-
-    .display .now{
-      font-size:72px;
-      font-weight:900;
-      letter-spacing:4px;
-      margin:8px 0 16px;
-    }
-
-    .queue{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
-
-    .badge{
-      padding:12px 24px;
-      min-width:60px;
-      text-align:center;
-      border-radius:999px;
-      background:#020617;
-      border:1px solid rgba(255,255,255,.15);
-      font-size:20px;
-      font-weight:700;
-    }
-
-    .login input{
-      width:100%;
-      padding:14px;
-      font-size:16px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.2);
-      background:#020617;
-      color:var(--text);
-    }
-
-    .login button{
-      width:100%;
-      margin-top:12px;
-      padding:14px;
-      font-size:16px;
-      font-weight:700;
-      border-radius:12px;
-      border:none;
-      background:var(--secondary);
-      color:#020617;
-    }
-
-    .error{
-      color:var(--danger);
-      margin-top:8px
-    }
-
-    .counter-actions{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-    }
-
-    .btn{
-      padding:18px;
-      font-size:18px;
-      font-weight:800;
-      border-radius:14px;
-      border:none;
-      box-shadow: 0 6px 16px rgba(0,0,0,.3);
-    }
-
-    .btn.primary{background:var(--primary);color:#052e16}
-    .btn.secondary{background:var(--secondary);color:#020617}
-    .btn.danger{background:var(--danger);color:#020617}
-
-    .stats{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .stat{
-      background:#020617;
-      border-radius:12px;
-      padding:12px;
-      text-align:center;
-    }
-
-    .stat h3{
-      margin:0;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .stat p{
-      margin:6px 0 0;
-      font-size:24px;
-      font-weight:800;
-    }
-
-    footer{
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-      padding:16px 0 24px;
-    }
-
-    @media (min-width:768px){
-      main{max-width:900px;margin:auto}
-      .display .now{font-size:96px}
-      .queue{grid-template-columns:repeat(6,1fr)}
-      .counter-actions{grid-template-columns:repeat(3,1fr)}
-      .stats{grid-template-columns:repeat(3,1fr)}
-    }
-
-    button{
-      transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        filter 0.15s ease;
-      cursor: pointer;
-    }
-
-    button:hover{
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 20px rgba(0,0,0,.35);
-      filter: brightness(1.05);
-    }
-
-    button:active{
-      transform: translateY(1px) scale(0.97);
-      box-shadow: 0 3px 8px rgba(0,0,0,.4);
-      filter: brightness(0.95);
-    }
-
-    .nav button:active{
-      transform: scale(0.95);
-    }
+    :root{--bg:#f7f2e8;--card:#fffaf2;--ink:#2d241d;--muted:#72675f;--line:#e7d9c5;--accent:#c96d16;--drink:#1d5f73;--ice:#0f766e;--danger:#b42318;--ok:#166534}
+    *{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#f9f4ea,#efe0c8);color:var(--ink)}
+    .wrap{max-width:1380px;margin:0 auto;padding:20px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    .title h1{margin:0;font-size:28px}.title p{margin:6px 0 0;color:var(--muted)}
+    .pill{padding:10px 14px;border-radius:999px;background:#fff7eb;border:1px solid var(--line);color:var(--muted)}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}.tab{border:0;padding:12px 16px;border-radius:999px;background:#fff7eb;cursor:pointer}.tab.active{background:var(--accent);color:#fff}
+    .view{display:none}.view.active{display:block}
+    .card{background:rgba(255,250,242,.94);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 30px rgba(72,44,12,.08)}
+    .grid2{display:grid;grid-template-columns:1.15fr 1fr;gap:16px}.gridA{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .hero{min-height:240px;display:grid;place-items:center;text-align:center}.hero .n{font-size:clamp(72px,12vw,140px);font-weight:900;color:var(--accent);letter-spacing:.08em}
+    .muted{color:var(--muted);font-size:14px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.section-title h2,.section-title h3{margin:0}
+    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}.chip{min-height:76px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-size:28px;font-weight:800}.chip.empty{font-size:18px;color:var(--muted)}
+    .login, .stats, .orders, .products{display:grid;gap:12px}
+    input,textarea{width:100%;padding:14px;border-radius:16px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit}
+    textarea{min-height:88px;resize:vertical}
+    .btns{display:flex;flex-wrap:wrap;gap:10px}.btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit}.primary{background:var(--accent);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.drink{background:rgba(29,95,115,.12);color:var(--drink)}.ice{background:rgba(15,118,110,.12);color:var(--ice)}.danger{background:rgba(180,35,24,.12);color:var(--danger)}.ok{background:rgba(22,101,52,.12);color:var(--ok)}
+    .group{padding:16px;border-radius:18px;border:1px solid var(--line);background:#fffdf9}.list{display:grid;gap:10px}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:16px;border:1px solid var(--line);background:#fff}
+    .qty{display:flex;align-items:center;gap:8px}.qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d4;cursor:pointer}.qty span{min-width:28px;text-align:center;font-weight:800}
+    .summary-item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border-radius:16px;border:1px solid var(--line);background:#fff}.empty{padding:22px;border-radius:16px;border:1px dashed var(--line);text-align:center;color:var(--muted)}
+    .total{padding:16px;border-radius:18px;background:#fde8c2}.total strong{display:block;font-size:38px;margin-top:6px}
+    .switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-radius:16px;border:1px solid var(--line);background:#fff}
+    .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}.toggle:checked{background:var(--accent)}.toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}.toggle:checked:after{transform:translateX(26px)}
+    .metric{padding:16px;border-radius:18px;border:1px solid var(--line);background:#fff}.metric strong{display:block;font-size:30px;margin-top:8px}
+    .board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.col{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fff}.cards{display:grid;gap:12px}
+    .order{padding:14px;border-radius:18px;border:1px solid var(--line);background:#fffdf8}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.order-id{font-size:24px;font-weight:900}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.tag{padding:5px 10px;border-radius:999px;background:#f4e7d4;font-size:12px}.pending{color:var(--accent)}.preparing{color:var(--drink)}.done{color:var(--ok)}.cancelled{color:var(--danger)}
+    .lines{display:grid;gap:8px}.line{display:flex;justify-content:space-between;gap:12px}.note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}
+    table{width:100%;border-collapse:collapse} th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top} th{color:var(--muted);font-weight:600}
+    .notice{padding:16px;border-radius:16px;background:#fff7eb;border:1px dashed var(--line);color:var(--muted)}
+    @media (max-width:1100px){.grid2,.gridA,.two,.board,.four{grid-template-columns:1fr}} @media (max-width:720px){.top{flex-direction:column;align-items:flex-start}.summary-item{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <header>
-    <h1>預約系統</h1>
-    <div class="nav">
-      <button id="nav-display" class="active">顯示</button>
-      <button id="nav-counter">櫃檯</button>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">
+        <h1>飲料冰品店點餐系統</h1>
+        <p>櫃台點餐、取餐叫號、製作看板、今日營收</p>
+      </div>
+      <div class="pill" id="connectionStatus">連線中...</div>
     </div>
-  </header>
 
-  <main>
-    <section id="page-display" class="card display">
-      <div class="label">目前叫號</div>
-      <div id="nowNumber" class="now">—</div>
+    <div class="tabs">
+      <button class="tab active" data-view="displayView">顯示頁</button>
+      <button class="tab" data-view="counterView">櫃台頁</button>
+      <button class="tab" data-view="kitchenView">製作頁</button>
+      <button class="tab" data-view="manageView">管理頁</button>
+    </div>
 
-      <div class="label">等待中</div>
-      <div id="waitingList" class="queue"></div>
-    </section>
-
-    <section id="page-login" class="card login" style="display:none">
-      <input id="password" type="password" placeholder="請輸入櫃檯密碼">
-      <button id="loginBtn">登入櫃檯</button>
-      <div id="loginError" class="error"></div>
-    </section>
-
-    <section id="page-counter" class="card" style="display:none">
-      <div class="counter-actions">
-        <button id="addNumber" class="btn primary">新增號碼</button>
-        <button id="callNext" class="btn secondary">叫下一號</button>
-        <button id="resetAll" class="btn danger">全部重置</button>
+    <section class="view active" id="displayView">
+      <div class="grid2">
+        <div class="card hero">
+          <div>
+            <div class="muted">目前叫號</div>
+            <div class="n" id="currentPickupDisplay">--</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">
+            <h2>等待取餐</h2>
+            <span class="muted" id="waitingCount">0 筆</span>
+          </div>
+          <div class="chips" id="waitingList"></div>
+        </div>
       </div>
+    </section>
 
+    <section class="view" id="counterView">
+      <div class="gridA">
+        <div class="card">
+          <div class="section-title">
+            <h2>櫃台點餐</h2>
+            <span class="muted">先選品項，再決定要不要叫號</span>
+          </div>
+          <div id="counterGate" class="notice">請先登入櫃台帳號。</div>
+          <div id="counterContent" style="display:none">
+            <div class="two">
+              <div class="group">
+                <div class="section-title"><h3>飲料區</h3><span class="muted">吧台</span></div>
+                <div class="list" id="drinkProducts"></div>
+              </div>
+              <div class="group">
+                <div class="section-title"><h3>冰品區</h3><span class="muted">冰區</span></div>
+                <div class="list" id="iceProducts"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:16px;padding:16px">
+              <div class="section-title"><h3>訂單摘要</h3><span class="muted" id="summaryCount">0 項</span></div>
+              <div class="orders" id="orderSummary"></div>
+              <div class="switch" style="margin-top:14px">
+                <div><strong>需要取餐號</strong><div class="muted">勾選後自動產生 A001</div></div>
+                <input type="checkbox" class="toggle" id="needsPickupToggle" />
+              </div>
+              <div style="margin-top:14px">
+                <label for="orderNote">備註</label>
+                <textarea id="orderNote" placeholder="例如：少冰、冰品先做"></textarea>
+              </div>
+              <div class="total" style="margin-top:14px">訂單總價<strong id="totalAmount">$0</strong></div>
+              <div class="btns" style="margin-top:14px">
+                <button class="btn primary" id="createOrderBtn">建立訂單</button>
+                <button class="btn secondary" id="clearOrderBtn">清空本單</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="card">
+            <div class="section-title"><h2>櫃台登入</h2><span class="muted" id="loginStateText">尚未登入</span></div>
+            <div class="login">
+              <input id="passwordInput" type="password" placeholder="輸入櫃台密碼" />
+              <button class="btn primary" id="loginBtn">登入櫃台</button>
+              <div class="muted" id="loginMessage"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title"><h2>叫號操作</h2><span class="muted">只叫有取餐號的單</span></div>
+            <div class="two">
+              <div class="metric"><span class="muted">目前叫號</span><strong id="counterCurrentPickup">--</strong></div>
+              <div class="metric"><span class="muted">等待數量</span><strong id="counterWaitingCount">0</strong></div>
+            </div>
+            <div class="btns" style="margin-top:14px">
+              <button class="btn primary" id="callNextBtn">叫下一號</button>
+              <button class="btn danger" id="resetCallingBtn">重整叫號</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title"><h2>今日速報</h2><span class="muted">櫃台快速看</span></div>
+            <div class="two">
+              <div class="metric"><span class="muted">今日營收</span><strong id="quickRevenue">$0</strong></div>
+              <div class="metric"><span class="muted">今日訂單</span><strong id="quickOrders">0</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="kitchenView">
       <div class="card">
-        <h3>刪除等待中的號碼</h3>
-        <input id="deleteNumber" type="number" placeholder="輸入要刪除的號碼">
-        <button id="deleteNumberBtn" class="btn danger">刪除號碼</button>
-      </div>
-
-      <div class="card">
-        <h3>回復誤刪的號碼</h3>
-        <input id="restoreNumber" type="number" placeholder="輸入要回復的號碼">
-        <button id="restoreNumberBtn" class="btn primary">回復號碼</button>
-      </div>
-
-      <div class="stats">
-        <div class="stat">
-          <h3>目前叫號</h3>
-          <p id="statCurrent">—</p>
-        </div>
-        <div class="stat">
-          <h3>等待人數</h3>
-          <p id="statWaiting">0</p>
-        </div>
-        <div class="stat">
-          <h3>最後號碼</h3>
-          <p id="statLast">0</p>
+        <div class="section-title"><h2>製作看板</h2><span class="muted">冰品和飲料分區</span></div>
+        <div id="kitchenGate" class="notice">製作頁需要先登入櫃台帳號。</div>
+        <div id="kitchenContent" class="board" style="display:none">
+          <div class="col">
+            <div class="section-title"><h3>飲料區</h3><span class="muted" id="drinkOrderCount">0 張</span></div>
+            <div class="cards" id="drinkOrders"></div>
+          </div>
+          <div class="col">
+            <div class="section-title"><h3>冰品區</h3><span class="muted" id="iceOrderCount">0 張</span></div>
+            <div class="cards" id="iceOrders"></div>
+          </div>
         </div>
       </div>
     </section>
-  </main>
 
-<script>
-  let adminToken = '';
+    <section class="view" id="manageView">
+      <div class="card">
+        <div class="section-title"><h2>今日管理</h2><span class="muted">只記訂單總價</span></div>
+        <div id="manageGate" class="notice">管理頁需要先登入櫃台帳號。</div>
+        <div id="manageContent" style="display:none">
+          <div class="four">
+            <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
+            <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
+            <div class="metric"><span class="muted">待製作</span><strong id="statPending">0</strong></div>
+            <div class="metric"><span class="muted">製作中</span><strong id="statPreparing">0</strong></div>
+          </div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section-title"><h3>商品銷量</h3><span class="muted">依售出數量排序</span></div>
+            <div id="salesTableWrap"></div>
+          </div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section-title"><h3>訂單列表</h3><span class="muted">可取消未完成訂單</span></div>
+            <div id="ordersTableWrap"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
-  const state = {
-    current: null,
-    last: 0,
-    queue: [],
-    called: []
-  };
+  <script>
+    const apiParam = new URLSearchParams(window.location.search).get("api");
+    if (apiParam) localStorage.setItem("apiBaseUrl", apiParam);
+    const API_BASE = localStorage.getItem("apiBaseUrl") || "http://localhost:3000";
+    const tabs = [...document.querySelectorAll(".tab")];
+    const state = { token: localStorage.getItem("adminToken") || "", products: [], orders: [], calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] }, stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] } };
+    const publicState = { currentPickupNumber: null, waitingPickupNumbers: [] };
+    const cart = new Map();
+    let timer = null;
 
-  function render() {
-    document.getElementById('nowNumber').textContent = state.current ?? '—';
-    document.getElementById('statCurrent').textContent = state.current ?? '—';
-    document.getElementById('statWaiting').textContent = state.queue.length;
-    document.getElementById('statLast').textContent = state.last;
+    tabs.forEach(tab => tab.onclick = () => {
+      tabs.forEach(item => item.classList.toggle("active", item === tab));
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === tab.dataset.view));
+    });
 
-    const list = document.getElementById('waitingList');
-    list.innerHTML = '';
+    const $ = id => document.getElementById(id);
+    const money = n => `$${Number(n || 0).toLocaleString("zh-TW")}`;
+    const time = v => new Date(v).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+    const api = path => `${API_BASE}${path}`;
+    const auth = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${state.token}` });
 
-    if (state.queue.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'badge';
-      empty.textContent = '等待中…';
-      list.appendChild(empty);
-    } else {
-      state.queue.slice(0, 6).forEach((n, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.style.display = 'flex';
-        wrapper.style.flexDirection = 'column';
-        wrapper.style.alignItems = 'center';
-
-        if (index < 3) {
-          const timeLabel = document.createElement('div');
-          let seconds = (index + 1) * 30;
-          let minutes = Math.floor(seconds / 60);
-          let sec = seconds % 60;
-          timeLabel.textContent = `預計於 ${minutes > 0 ? minutes + '分' : ''}${sec > 0 ? sec + '秒' : ''}`;
-          timeLabel.style.fontSize = '12px';
-          timeLabel.style.color = '#ef4444';
-          timeLabel.style.marginBottom = '4px';
-          wrapper.appendChild(timeLabel);
-        }
-
-        const b = document.createElement('div');
-        b.className = 'badge';
-        b.textContent = n;
-
-        if (index < 3) {
-          b.style.background = '#ef4444';
-          b.style.color = '#020617';
-        }
-
-        wrapper.appendChild(b);
-        list.appendChild(wrapper);
-      });
+    async function req(path, options = {}) {
+      const res = await fetch(api(path), options);
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) logout("登入已失效，請重新登入");
+      if (!res.ok) throw new Error(data.message || "操作失敗");
+      return data;
     }
-  }
 
-  async function loadState() {
-    try {
-      const res = await fetch('http://localhost:3000/api/state');
-      const data = await res.json();
-      Object.assign(state, data);
-      render();
-    } catch (error) {
-      console.error(error);
-      alert('讀取狀態失敗，請確認後端有開著');
+    function status(text, ok = true) {
+      $("connectionStatus").textContent = text;
+      $("connectionStatus").style.color = ok ? "var(--ok)" : "var(--danger)";
     }
-  }
 
-  const pageDisplay = document.getElementById('page-display');
-  const pageLogin = document.getElementById('page-login');
-  const pageCounter = document.getElementById('page-counter');
+    function logout(message) {
+      state.token = "";
+      localStorage.removeItem("adminToken");
+      gate(false, message);
+    }
 
-  function show(p) {
-    pageDisplay.style.display = 'none';
-    pageLogin.style.display = 'none';
-    pageCounter.style.display = 'none';
-    p.style.display = 'block';
-  }
+    function gate(isIn, msg = "") {
+      $("counterGate").style.display = isIn ? "none" : "block";
+      $("counterContent").style.display = isIn ? "block" : "none";
+      $("kitchenGate").style.display = isIn ? "none" : "block";
+      $("kitchenContent").style.display = isIn ? "grid" : "none";
+      $("manageGate").style.display = isIn ? "none" : "block";
+      $("manageContent").style.display = isIn ? "block" : "none";
+      $("loginStateText").textContent = isIn ? "已登入" : "尚未登入";
+      $("loginMessage").textContent = msg;
+    }
 
-  document.getElementById('nav-display').onclick = () => show(pageDisplay);
-  document.getElementById('nav-counter').onclick = () => show(pageLogin);
-
-  document.getElementById('loginBtn').onclick = async () => {
-    const password = document.getElementById('password').value;
-    const loginError = document.getElementById('loginError');
-
-    loginError.textContent = '';
-
-    try {
-      const res = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        adminToken = data.token;
-        document.getElementById('password').value = '';
-        show(pageCounter);
-      } else {
-        loginError.textContent = data.message || '密碼錯誤';
+    function drawPublic() {
+      $("currentPickupDisplay").textContent = publicState.currentPickupNumber || "--";
+      $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 筆`;
+      const wrap = $("waitingList");
+      wrap.innerHTML = "";
+      if (!publicState.waitingPickupNumbers.length) {
+        const empty = document.createElement("div");
+        empty.className = "chip empty";
+        empty.textContent = "目前沒有等待號碼";
+        wrap.appendChild(empty);
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      loginError.textContent = '無法連線到後端';
+      publicState.waitingPickupNumbers.forEach(num => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = num;
+        wrap.appendChild(chip);
+      });
     }
-  };
 
-  function authHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${adminToken}`
+    function drawProducts() {
+      const drink = $("drinkProducts");
+      const ice = $("iceProducts");
+      drink.innerHTML = "";
+      ice.innerHTML = "";
+      state.products.forEach(product => {
+        const qty = cart.get(product.id) || 0;
+        const box = document.createElement("div");
+        box.className = "item";
+        box.innerHTML = `<div><strong>${product.name}</strong><div class="muted">${money(product.price)}</div></div><div class="qty"><button data-op="minus">-</button><span>${qty}</span><button data-op="plus">+</button></div>`;
+        box.querySelectorAll("button").forEach(btn => btn.onclick = () => {
+          const next = (cart.get(product.id) || 0) + (btn.dataset.op === "plus" ? 1 : -1);
+          if (next <= 0) cart.delete(product.id); else cart.set(product.id, next);
+          drawProducts(); drawSummary();
+        });
+        (product.category === "drink" ? drink : ice).appendChild(box);
+      });
+    }
+
+    function drawSummary() {
+      const wrap = $("orderSummary");
+      wrap.innerHTML = "";
+      const items = state.products.filter(product => cart.has(product.id)).map(product => ({ ...product, quantity: cart.get(product.id) }));
+      $("summaryCount").textContent = `${items.length} 項`;
+      if (!items.length) {
+        wrap.innerHTML = '<div class="empty">還沒有加入任何品項</div>';
+        $("totalAmount").textContent = "$0";
+        return;
+      }
+      let total = 0;
+      items.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        const row = document.createElement("div");
+        row.className = "summary-item";
+        row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">${item.category === "drink" ? "飲料" : "冰品"}</div></div><div>x ${item.quantity}</div><div>${money(subtotal)}</div>`;
+        wrap.appendChild(row);
+      });
+      $("totalAmount").textContent = money(total);
+    }
+
+    function statusText(v) {
+      return { pending: "待製作", preparing: "製作中", done: "完成", cancelled: "已取消" }[v] || v;
+    }
+
+    function kitchenCard(order, category) {
+      const items = order.items.filter(item => item.category === category);
+      if (!items.length || order.status === "done" || order.status === "cancelled") return null;
+      const card = document.createElement("div");
+      card.className = "order";
+      card.innerHTML = `
+        <div class="head"><div><div class="order-id">${order.pickupNumber || order.orderId}</div><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></div></div>
+        <div class="tags"><span class="tag ${order.status}">${statusText(order.status)}</span><span class="tag">${money(order.totalAmount)}</span><span class="tag">${order.pickupNumber || "無叫號"}</span></div>
+        <div class="lines">${items.map(item => `<div class="line"><span>${item.name}</span><strong>x ${item.quantity}</strong></div>`).join("")}</div>
+        ${order.note ? `<div class="note">${order.note}</div>` : ""}
+      `;
+      const actions = document.createElement("div");
+      actions.className = "btns";
+      actions.style.marginTop = "10px";
+      actions.innerHTML = '<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">完成</button>';
+      actions.querySelectorAll("button").forEach(btn => btn.onclick = async () => {
+        try {
+          await req(`/api/orders/${order.orderId}/status`, { method: "PATCH", headers: auth(), body: JSON.stringify({ status: btn.dataset.status }) });
+          await loadAdmin();
+        } catch (error) { alert(error.message); }
+      });
+      card.appendChild(actions);
+      return card;
+    }
+
+    function drawKitchen() {
+      const drinkWrap = $("drinkOrders");
+      const iceWrap = $("iceOrders");
+      drinkWrap.innerHTML = "";
+      iceWrap.innerHTML = "";
+      let drinkCount = 0, iceCount = 0;
+      state.orders.filter(order => order.status !== "done" && order.status !== "cancelled").forEach(order => {
+        const d = kitchenCard(order, "drink");
+        const i = kitchenCard(order, "ice");
+        if (d) { drinkWrap.appendChild(d); drinkCount++; }
+        if (i) { iceWrap.appendChild(i); iceCount++; }
+      });
+      if (!drinkCount) drinkWrap.innerHTML = '<div class="empty">目前沒有飲料單</div>';
+      if (!iceCount) iceWrap.innerHTML = '<div class="empty">目前沒有冰品單</div>';
+      $("drinkOrderCount").textContent = `${drinkCount} 張`;
+      $("iceOrderCount").textContent = `${iceCount} 張`;
+    }
+
+    function drawStats() {
+      $("counterCurrentPickup").textContent = state.calling.currentPickupNumber || "--";
+      $("counterWaitingCount").textContent = state.calling.waitingPickupNumbers.length;
+      $("quickRevenue").textContent = money(state.stats.totalRevenue);
+      $("quickOrders").textContent = state.stats.totalOrders;
+      $("statRevenue").textContent = money(state.stats.totalRevenue);
+      $("statOrders").textContent = state.stats.totalOrders;
+      $("statPending").textContent = state.stats.pendingOrders;
+      $("statPreparing").textContent = state.stats.preparingOrders;
+    }
+
+    function drawSales() {
+      const rows = state.stats.productSales || [];
+      $("salesTableWrap").innerHTML = rows.length ? `
+        <table><thead><tr><th>品項</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>
+        ${rows.map(row => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}
+        </tbody></table>` : '<div class="empty">今天還沒有銷售資料</div>';
+    }
+
+    function drawOrders() {
+      $("ordersTableWrap").innerHTML = state.orders.length ? `
+        <table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>
+        ${state.orders.map(order => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map(item => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" ? '<span class="muted">無</span>' : `<button class="btn danger" data-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}
+        </tbody></table>` : '<div class="empty">還沒有訂單</div>';
+      document.querySelectorAll("[data-id]").forEach(btn => btn.onclick = async () => {
+        if (!confirm("確定要取消這張訂單嗎？")) return;
+        try {
+          await req(`/api/orders/${btn.dataset.id}/cancel`, { method: "POST", headers: auth() });
+          await loadAdmin();
+        } catch (error) { alert(error.message); }
+      });
+    }
+
+    function drawAdmin() {
+      if (!state.token) return;
+      drawProducts(); drawSummary(); drawStats(); drawKitchen(); drawSales(); drawOrders();
+    }
+
+    async function loadPublic() {
+      const res = await fetch(api("/api/public-state"));
+      if (!res.ok) throw new Error("無法讀取顯示資料");
+      Object.assign(publicState, await res.json());
+      drawPublic();
+    }
+
+    async function loadAdmin() {
+      if (!state.token) return;
+      const data = await req("/api/admin-state", { headers: { Authorization: `Bearer ${state.token}` } });
+      state.products = data.products; state.orders = data.orders; state.calling = data.calling; state.stats = data.stats;
+      gate(true, "已登入櫃台");
+      drawAdmin();
+    }
+
+    async function refresh() {
+      try {
+        await loadPublic();
+        if (state.token) await loadAdmin();
+        status("系統已連線", true);
+      } catch (error) {
+        status(error.message, false);
+      }
+    }
+
+    $("loginBtn").onclick = async () => {
+      try {
+        const data = await req("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: $("passwordInput").value }) });
+        state.token = data.token;
+        localStorage.setItem("adminToken", data.token);
+        $("passwordInput").value = "";
+        await loadAdmin();
+      } catch (error) { gate(false, error.message); }
     };
-  }
 
-  function handleUnauthorized(data) {
-    if (data && data.message === '未授權，請先登入') {
-      adminToken = '';
-      show(pageLogin);
-      document.getElementById('loginError').textContent = '請重新登入';
-      return true;
-    }
-    return false;
-  }
+    $("createOrderBtn").onclick = async () => {
+      const items = [...cart.entries()].map(([productId, quantity]) => ({ productId, quantity }));
+      if (!items.length) return alert("請先加入品項");
+      try {
+        await req("/api/orders", { method: "POST", headers: auth(), body: JSON.stringify({ items, note: $("orderNote").value, needsPickupNumber: $("needsPickupToggle").checked }) });
+        cart.clear(); $("orderNote").value = ""; $("needsPickupToggle").checked = false;
+        drawProducts(); drawSummary(); await refresh();
+      } catch (error) { alert(error.message); }
+    };
 
-  document.getElementById('addNumber').onclick = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/api/add-number', {
-        method: 'POST',
-        headers: authHeaders()
-      });
+    $("clearOrderBtn").onclick = () => {
+      cart.clear(); $("orderNote").value = ""; $("needsPickupToggle").checked = false; drawProducts(); drawSummary();
+    };
+    $("callNextBtn").onclick = async () => { try { await req("/api/call-next", { method: "POST", headers: auth() }); await refresh(); } catch (error) { alert(error.message); } };
+    $("resetCallingBtn").onclick = async () => { try { await req("/api/reset-calling", { method: "POST", headers: auth() }); await refresh(); } catch (error) { alert(error.message); } };
 
-      const data = await res.json();
-
-      if (handleUnauthorized(data)) return;
-
-      if (res.ok && data.success) {
-        Object.assign(state, data.state);
-        render();
-      } else {
-        alert(data.message || '新增失敗');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('無法連線到後端');
-    }
-  };
-
-  document.getElementById('callNext').onclick = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/api/call-next', {
-        method: 'POST',
-        headers: authHeaders()
-      });
-
-      const data = await res.json();
-
-      if (handleUnauthorized(data)) return;
-
-      if (res.ok && data.success) {
-        Object.assign(state, data.state);
-        render();
-      } else {
-        alert(data.message || '叫號失敗');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('無法連線到後端');
-    }
-  };
-
-  document.getElementById('resetAll').onclick = async () => {
-    if (!confirm('確定全部重置？')) return;
-
-    try {
-      const res = await fetch('http://localhost:3000/api/reset', {
-        method: 'POST',
-        headers: authHeaders()
-      });
-
-      const data = await res.json();
-
-      if (handleUnauthorized(data)) return;
-
-      if (res.ok && data.success) {
-        Object.assign(state, data.state);
-        render();
-      } else {
-        alert(data.message || '重置失敗');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('無法連線到後端');
-    }
-  };
-
-  document.getElementById('deleteNumberBtn').onclick = async () => {
-    const input = document.getElementById('deleteNumber');
-    const n = parseInt(input.value);
-
-    if (isNaN(n)) {
-      alert('請輸入號碼');
-      return;
+    async function init() {
+      gate(Boolean(state.token), state.token ? "已登入櫃台" : "");
+      await refresh();
+      clearInterval(timer);
+      timer = setInterval(refresh, 5000);
     }
 
-    try {
-      const res = await fetch('http://localhost:3000/api/delete-number', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ number: n })
-      });
-
-      const data = await res.json();
-
-      if (handleUnauthorized(data)) return;
-
-      if (res.ok && data.success) {
-        Object.assign(state, data.state);
-        render();
-        input.value = '';
-        input.blur();
-      } else {
-        alert(data.message || '刪除失敗');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('無法連線到後端');
-    }
-  };
-
-  document.getElementById('restoreNumberBtn').onclick = async () => {
-    const input = document.getElementById('restoreNumber');
-    const n = parseInt(input.value);
-
-    if (isNaN(n)) {
-      alert('請輸入號碼');
-      return;
-    }
-
-    try {
-      const res = await fetch('http://localhost:3000/api/restore-number', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ number: n })
-      });
-
-      const data = await res.json();
-
-      if (handleUnauthorized(data)) return;
-
-      if (res.ok && data.success) {
-        Object.assign(state, data.state);
-        render();
-        input.value = '';
-        input.blur();
-      } else {
-        alert(data.message || '回復失敗');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('無法連線到後端');
-    }
-  };
-
-  loadState();
-</script>
+    init();
+  </script>
 </body>
 </html>

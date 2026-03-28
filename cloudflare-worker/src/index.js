@@ -1,4 +1,4 @@
-const jsonHeaders = {
+﻿const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8"
 };
 
@@ -14,7 +14,7 @@ const products = [
   { id: "ice-mixed-fruit", name: "綜合水果冰", category: "ice", price: 100, isActive: true }
 ];
 
-const productMap = new Map(products.map(product => [product.id, product]));
+const productMap = new Map(products.map((product) => [product.id, product]));
 
 const defaultState = {
   orders: [],
@@ -64,13 +64,13 @@ function formatOrderId(sequence) {
 
 function createSessionToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
-  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function unauthorized() {
   return {
     success: false,
-    message: "未授權，請先登入"
+    message: "請先登入櫃台密碼"
   };
 }
 
@@ -140,24 +140,14 @@ export class CounterState {
     if (request.method === "POST" && url.pathname === "/api/login") {
       const body = await readJson(request);
       if (body.password !== this.env.ADMIN_PASSWORD) {
-        return json(
-          {
-            success: false,
-            message: "密碼錯誤"
-          },
-          { status: 401 }
-        );
+        return json({ success: false, message: "櫃台密碼錯誤" }, { status: 401 });
       }
 
       const token = createSessionToken();
       data.sessions.push(token);
       await this.saveData(data);
 
-      return json({
-        success: true,
-        message: "登入成功",
-        token
-      });
+      return json({ success: true, message: "登入成功", token });
     }
 
     if (request.method === "GET" && url.pathname === "/api/admin-state") {
@@ -168,14 +158,6 @@ export class CounterState {
       return json(this.sanitizeState(data));
     }
 
-    if (request.method === "GET" && url.pathname === "/api/products") {
-      if (!this.isAuthorized(request, data)) {
-        return json(unauthorized(), { status: 401 });
-      }
-
-      return json({ products });
-    }
-
     if (request.method === "POST" && url.pathname === "/api/orders") {
       if (!this.isAuthorized(request, data)) {
         return json(unauthorized(), { status: 401 });
@@ -183,15 +165,8 @@ export class CounterState {
 
       const body = await readJson(request);
       const items = Array.isArray(body.items) ? body.items : [];
-
       if (!items.length) {
-        return json(
-          {
-            success: false,
-            message: "請至少選一個品項"
-          },
-          { status: 400 }
-        );
+        return json({ success: false, message: "請先選擇商品" }, { status: 400 });
       }
 
       const normalizedItems = [];
@@ -200,13 +175,7 @@ export class CounterState {
         const quantity = Number(rawItem.quantity);
 
         if (!product || !product.isActive || !Number.isInteger(quantity) || quantity <= 0) {
-          return json(
-            {
-              success: false,
-              message: "品項資料不正確"
-            },
-            { status: 400 }
-          );
+          return json({ success: false, message: "商品或數量不正確" }, { status: 400 });
         }
 
         normalizedItems.push({
@@ -220,7 +189,6 @@ export class CounterState {
       }
 
       data.orderSequence += 1;
-
       let pickupNumber = null;
       if (body.needsPickupNumber) {
         data.pickupSequence += 1;
@@ -242,15 +210,12 @@ export class CounterState {
       this.rebuildWaitingQueue(data);
       await this.saveData(data);
 
-      return json(
-        {
-          success: true,
-          message: "訂單建立成功",
-          order,
-          state: this.sanitizeState(data)
-        },
-        { status: 201 }
-      );
+      return json({
+        success: true,
+        message: "訂單建立成功",
+        order,
+        state: this.sanitizeState(data)
+      }, { status: 201 });
     }
 
     if (request.method === "POST" && url.pathname === "/api/call-next") {
@@ -259,26 +224,75 @@ export class CounterState {
       }
 
       if (!data.waitingPickupNumbers.length) {
-        return json(
-          {
-            success: false,
-            message: "目前沒有等待叫號"
-          },
-          { status: 400 }
-        );
+        if (data.currentPickupNumber) {
+          return json({
+            success: true,
+            message: `目前沒有下一號，維持 ${data.currentPickupNumber}`,
+            calling: this.sanitizeState(data).calling
+          });
+        }
+
+        return json({
+          success: true,
+          message: "目前沒有等待叫號",
+          calling: this.sanitizeState(data).calling
+        });
       }
 
       const nextPickupNumber = data.waitingPickupNumbers.shift();
       data.currentPickupNumber = nextPickupNumber;
-      if (!data.calledPickupNumbers.includes(nextPickupNumber)) {
-        data.calledPickupNumbers.unshift(nextPickupNumber);
-      }
+      data.calledPickupNumbers = [
+        nextPickupNumber,
+        ...data.calledPickupNumbers.filter((number) => number !== nextPickupNumber)
+      ].slice(0, 10);
       await this.saveData(data);
 
       return json({
         success: true,
         message: `已叫號 ${nextPickupNumber}`,
-        state: this.sanitizeState(data)
+        calling: this.sanitizeState(data).calling
+      });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/recall-current") {
+      if (!this.isAuthorized(request, data)) {
+        return json(unauthorized(), { status: 401 });
+      }
+
+      if (!data.currentPickupNumber) {
+        return json({ success: false, message: "目前沒有可重叫的號碼" }, { status: 400 });
+      }
+
+      data.calledPickupNumbers = [
+        data.currentPickupNumber,
+        ...data.calledPickupNumbers.filter((number) => number !== data.currentPickupNumber)
+      ].slice(0, 10);
+      await this.saveData(data);
+
+      return json({
+        success: true,
+        message: `重新叫號 ${data.currentPickupNumber}`,
+        calling: this.sanitizeState(data).calling
+      });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/clear-current-pickup") {
+      if (!this.isAuthorized(request, data)) {
+        return json(unauthorized(), { status: 401 });
+      }
+
+      if (!data.currentPickupNumber) {
+        return json({ success: false, message: "目前沒有號碼可清除" }, { status: 400 });
+      }
+
+      const clearedPickupNumber = data.currentPickupNumber;
+      data.currentPickupNumber = null;
+      await this.saveData(data);
+
+      return json({
+        success: true,
+        message: `已清除目前叫號 ${clearedPickupNumber}`,
+        calling: this.sanitizeState(data).calling
       });
     }
 
@@ -294,8 +308,8 @@ export class CounterState {
 
       return json({
         success: true,
-        message: "叫號佇列已重整",
-        state: this.sanitizeState(data)
+        message: "叫號狀態已重設",
+        calling: this.sanitizeState(data).calling
       });
     }
 
@@ -305,40 +319,21 @@ export class CounterState {
       }
 
       const orderId = url.pathname.split("/")[3];
-      const order = data.orders.find(item => item.orderId === orderId);
+      const order = data.orders.find((item) => item.orderId === orderId);
       if (!order) {
-        return json(
-          {
-            success: false,
-            message: "找不到訂單"
-          },
-          { status: 404 }
-        );
+        return json({ success: false, message: "找不到指定訂單" }, { status: 404 });
       }
 
       const body = await readJson(request);
       if (!["pending", "preparing", "done"].includes(body.status)) {
-        return json(
-          {
-            success: false,
-            message: "狀態不正確"
-          },
-          { status: 400 }
-        );
-      }
-
-      if (order.status === "cancelled") {
-        return json(
-          {
-            success: false,
-            message: "已取消訂單不能再更新狀態"
-          },
-          { status: 400 }
-        );
+        return json({ success: false, message: "狀態不正確" }, { status: 400 });
       }
 
       order.status = body.status;
-      this.syncCallingAfterOrderChange(data, order);
+      if (body.status === "done" && order.pickupNumber === data.currentPickupNumber) {
+        data.currentPickupNumber = null;
+      }
+      this.rebuildWaitingQueue(data);
       await this.saveData(data);
 
       return json({
@@ -355,29 +350,20 @@ export class CounterState {
       }
 
       const orderId = url.pathname.split("/")[3];
-      const order = data.orders.find(item => item.orderId === orderId);
+      const order = data.orders.find((item) => item.orderId === orderId);
       if (!order) {
-        return json(
-          {
-            success: false,
-            message: "找不到訂單"
-          },
-          { status: 404 }
-        );
+        return json({ success: false, message: "找不到指定訂單" }, { status: 404 });
       }
 
-      if (order.status === "cancelled") {
-        return json(
-          {
-            success: false,
-            message: "訂單已取消"
-          },
-          { status: 400 }
-        );
+      if (order.status === "done" || order.status === "cancelled") {
+        return json({ success: false, message: "這筆訂單不能取消" }, { status: 400 });
       }
 
       order.status = "cancelled";
-      this.syncCallingAfterOrderChange(data, order);
+      if (order.pickupNumber === data.currentPickupNumber) {
+        data.currentPickupNumber = null;
+      }
+      this.rebuildWaitingQueue(data);
       await this.saveData(data);
 
       return json({
@@ -388,29 +374,31 @@ export class CounterState {
       });
     }
 
-    return json(
-      {
-        success: false,
-        message: "Not found"
-      },
-      { status: 404 }
-    );
+    return json({ success: false, message: "找不到 API 路徑" }, { status: 404 });
   }
 
   async loadData() {
-    const stored = await this.state.storage.get("order-state");
-    if (stored) {
-      return {
-        ...clone(defaultState),
-        ...stored
-      };
-    }
-
-    return clone(defaultState);
+    const stored = await this.state.storage.get("data");
+    return stored ? { ...clone(defaultState), ...stored } : clone(defaultState);
   }
 
   async saveData(data) {
-    await this.state.storage.put("order-state", data);
+    await this.state.storage.put("data", data);
+  }
+
+  isAuthorized(request, data) {
+    const header = request.headers.get("Authorization") || "";
+    const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+    return Boolean(token) && data.sessions.includes(token);
+  }
+
+  rebuildWaitingQueue(data) {
+    const current = data.currentPickupNumber;
+    data.waitingPickupNumbers = data.orders
+      .filter((order) => order.needsPickupNumber && isActiveOrder(order))
+      .map((order) => order.pickupNumber)
+      .filter((pickupNumber) => pickupNumber && pickupNumber !== current)
+      .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
   }
 
   sanitizeState(data) {
@@ -427,69 +415,32 @@ export class CounterState {
   }
 
   buildStats(data) {
-    const validOrders = data.orders.filter(order => order.status !== "cancelled");
-    const totalRevenue = validOrders.reduce((sum, order) => sum + order.totalAmount, 0);
-    const productSales = {};
+    const validOrders = data.orders.filter((order) => order.status !== "cancelled");
+    const productSales = new Map();
 
-    validOrders.forEach(order => {
-      order.items.forEach(item => {
-        if (!productSales[item.productId]) {
-          productSales[item.productId] = {
-            productId: item.productId,
-            name: item.name,
-            category: item.category,
-            quantity: 0,
-            revenue: 0
-          };
-        }
+    for (const order of validOrders) {
+      for (const item of order.items) {
+        const existing = productSales.get(item.productId) || {
+          productId: item.productId,
+          name: item.name,
+          category: item.category,
+          quantity: 0,
+          revenue: 0
+        };
 
-        productSales[item.productId].quantity += item.quantity;
-        productSales[item.productId].revenue += item.subtotal;
-      });
-    });
+        existing.quantity += item.quantity;
+        existing.revenue += item.subtotal;
+        productSales.set(item.productId, existing);
+      }
+    }
 
     return {
-      totalRevenue,
+      totalRevenue: validOrders.reduce((sum, order) => sum + order.totalAmount, 0),
       totalOrders: validOrders.length,
-      pendingOrders: data.orders.filter(order => order.status === "pending").length,
-      preparingOrders: data.orders.filter(order => order.status === "preparing").length,
-      doneOrders: data.orders.filter(order => order.status === "done").length,
-      productSales: Object.values(productSales).sort((a, b) => b.quantity - a.quantity)
+      pendingOrders: data.orders.filter((order) => order.status === "pending").length,
+      preparingOrders: data.orders.filter((order) => order.status === "preparing").length,
+      doneOrders: data.orders.filter((order) => order.status === "done").length,
+      productSales: [...productSales.values()].sort((a, b) => b.quantity - a.quantity)
     };
-  }
-
-  rebuildWaitingQueue(data) {
-    const current = data.currentPickupNumber;
-    data.waitingPickupNumbers = data.orders
-      .filter(order => order.needsPickupNumber && isActiveOrder(order))
-      .map(order => order.pickupNumber)
-      .filter(number => number && number !== current)
-      .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
-  }
-
-  syncCallingAfterOrderChange(data, order) {
-    if (!order.pickupNumber) {
-      return;
-    }
-
-    if (order.status === "cancelled" || order.status === "done") {
-      data.waitingPickupNumbers = data.waitingPickupNumbers.filter(number => number !== order.pickupNumber);
-      data.calledPickupNumbers = data.calledPickupNumbers.filter(number => number !== order.pickupNumber);
-      if (data.currentPickupNumber === order.pickupNumber) {
-        data.currentPickupNumber = null;
-      }
-      return;
-    }
-
-    this.rebuildWaitingQueue(data);
-  }
-
-  isAuthorized(request, data) {
-    const authHeader = request.headers.get("Authorization") || "";
-    if (!authHeader.startsWith("Bearer ")) {
-      return false;
-    }
-
-    return data.sessions.includes(authHeader.slice(7));
   }
 }

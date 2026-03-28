@@ -19,6 +19,6 @@
     }
   ],
   "vars": {
-    "CORS_ORIGIN": "https://1ch666.github.io/123456789"
+    "CORS_ORIGIN": "https://1ch666.github.io"
   }
 }

@@ -113,7 +113,7 @@ function clone(value) {
 
 export default {
   async fetch(request, env) {
-    const origin = env.CORS_ORIGIN || "https://1ch666.github.io/123456789";
+    const origin = env.CORS_ORIGIN || "https://1ch666.github.io";
 
     if (request.method === "OPTIONS") {
       return new Response(null, {

@@ -1,13 +1,16 @@
 require("dotenv").config();
 
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 
 const app = express();
+const ROOT_DIR = path.resolve(__dirname, "..");
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(ROOT_DIR));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
@@ -151,7 +154,7 @@ function getOrderOr404(orderId, res) {
 }
 
 app.get("/", (req, res) => {
-  res.send("飲料冰品後端已啟動");
+  res.sendFile(path.join(ROOT_DIR, "index.html"));
 });
 
 app.get("/api/public-state", (req, res) => {

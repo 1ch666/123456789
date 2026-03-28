@@ -153,7 +153,10 @@
     if (apiParam) localStorage.setItem("apiBaseUrl", apiParam);
     localStorage.removeItem("adminToken");
 
-    const API_BASE = localStorage.getItem("apiBaseUrl") || "http://localhost:3000";
+    const defaultApiBase = window.location.protocol.startsWith("http")
+      ? window.location.origin
+      : "http://localhost:3000";
+    const API_BASE = localStorage.getItem("apiBaseUrl") || defaultApiBase;
     const tabs = [...document.querySelectorAll(".tab")];
     const protectedViews = new Set(["counterView", "kitchenView", "manageView"]);
     const state = { token: "", products: [], orders: [], calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] }, stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] } };

@@ -1,60 +1,107 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>憌脫??啣?摨?擗頂蝯?/title>
+  <title>飲料冰品店點餐系統</title>
   <style>
     :root{--bg:#f6efe4;--card:#fff9f1;--ink:#2b241e;--muted:#73675f;--line:#e5d6c2;--accent:#c46a18;--drink:#155e75;--ice:#0f766e;--danger:#b42318;--ok:#166534}
-    *{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#faf4ea,#efe0c8);color:var(--ink)}
-    .app{max-width:1440px;margin:0 auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-    .title h1{margin:0;font-size:30px}.title p{margin:6px 0 0;color:var(--muted)} .status{padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:#fff8ec;color:var(--muted)}
-    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}.tab{border:0;border-radius:999px;padding:12px 16px;background:#fff7eb;cursor:pointer}.tab.active{background:var(--accent);color:#fff}
-    .view{display:none}.view.active{display:block}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#faf4ea,#efe0c8);color:var(--ink)}
+    .app{max-width:1440px;margin:0 auto;padding:22px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    .title h1{margin:0;font-size:30px}
+    .title p{margin:6px 0 0;color:var(--muted)}
+    .status{padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:#fff8ec;color:var(--muted)}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+    .tab{border:0;border-radius:999px;padding:12px 16px;background:#fff7eb;cursor:pointer}
+    .tab.active{background:var(--accent);color:#fff}
+    .view{display:none}
+    .view.active{display:block}
     .card{background:rgba(255,249,241,.95);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 28px rgba(72,44,12,.08)}
-    .heroGrid,.counterGrid,.board,.two,.four{display:grid;gap:16px}.heroGrid{grid-template-columns:1.15fr 1fr}.counterGrid{grid-template-columns:1.15fr .95fr}.board,.two{grid-template-columns:repeat(2,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .section{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.section h2,.section h3{margin:0}.muted{font-size:14px;color:var(--muted)}
-    .displayHero{min-height:250px;display:grid;place-items:center;text-align:center}.displayHero .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
-    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px}.chip{min-height:78px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}.chip.empty{font-size:18px;color:var(--muted)}
-    .stack,.list{display:grid;gap:12px}.group{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fffdf9}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .qty{display:flex;align-items:center;gap:8px}.qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer}.qty span{min-width:30px;text-align:center;font-weight:800}
-    .summaryRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}.empty{padding:22px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted)}
-    .total{padding:16px;border-radius:18px;background:#fde8c4}.total strong{display:block;font-size:38px;margin-top:6px}
+    .heroGrid,.counterGrid,.board,.two,.four{display:grid;gap:16px}
+    .heroGrid{grid-template-columns:1.15fr 1fr}
+    .counterGrid{grid-template-columns:1.15fr .95fr}
+    .board,.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .section{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .section h2,.section h3{margin:0}
+    .muted{font-size:14px;color:var(--muted)}
+    .displayHero{min-height:250px;display:grid;place-items:center;text-align:center}
+    .displayHero .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
+    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px}
+    .chip{min-height:78px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}
+    .chip.empty{font-size:18px;color:var(--muted)}
+    .stack,.list{display:grid;gap:12px}
+    .group{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fffdf9}
+    .item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer}
+    .qty span{min-width:30px;text-align:center;font-weight:800}
+    .summaryRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .empty{padding:22px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted)}
+    .total{padding:16px;border-radius:18px;background:#fde8c4}
+    .total strong{display:block;font-size:38px;margin-top:6px}
     .switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}.toggle:checked{background:var(--accent)}.toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}.toggle:checked:after{transform:translateX(26px)}
-    input,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit} textarea{min-height:90px;resize:vertical}
-    .btns{display:flex;flex-wrap:wrap;gap:10px}.btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit}.primary{background:var(--accent);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.drink{background:rgba(21,94,117,.12);color:var(--drink)}.ok{background:rgba(22,101,52,.12);color:var(--ok)}.danger{background:rgba(180,35,24,.12);color:var(--danger)}
-    .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}.metric strong{display:block;font-size:30px;margin-top:8px}
-    .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}.orderHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.orderId{font-size:24px;font-weight:900}.tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.tag{padding:5px 10px;border-radius:999px;background:#f3e7d3;font-size:12px}
-    .note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}.notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
-    table{width:100%;border-collapse:collapse} th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top} th{color:var(--muted);font-weight:600}
-    @media (max-width:1100px){.heroGrid,.counterGrid,.board,.two,.four{grid-template-columns:1fr}} @media (max-width:720px){.top{flex-direction:column;align-items:flex-start}.summaryRow{grid-template-columns:1fr}}
+    .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}
+    .toggle:checked{background:var(--accent)}
+    .toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+    .toggle:checked:after{transform:translateX(26px)}
+    input,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit}
+    textarea{min-height:90px;resize:vertical}
+    .btns{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit}
+    .primary{background:var(--accent);color:#fff}
+    .secondary{background:#fff;border:1px solid var(--line)}
+    .drink{background:rgba(21,94,117,.12);color:var(--drink)}
+    .ok{background:rgba(22,101,52,.12);color:var(--ok)}
+    .danger{background:rgba(180,35,24,.12);color:var(--danger)}
+    .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+    .metric strong{display:block;font-size:30px;margin-top:8px}
+    .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
+    .orderHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .orderId{font-size:24px;font-weight:900}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .tag{padding:5px 10px;border-radius:999px;background:#f3e7d3;font-size:12px}
+    .note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}
+    .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);font-weight:600}
+    @media (max-width:1100px){.heroGrid,.counterGrid,.board,.two,.four{grid-template-columns:1fr}}
+    @media (max-width:720px){.top{flex-direction:column;align-items:flex-start}.summaryRow{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="app">
     <div class="top">
       <div class="title">
-        <h1>憌脫??啣?摨?擗頂蝯?/h1>
-        <p>瑹暺???擗?ˊ雿??踴??亦???/p>
+        <h1>飲料冰品店點餐系統</h1>
+        <p>櫃台點餐、取餐叫號、製作看板、今日營收</p>
       </div>
-      <div class="status" id="connectionStatus">???銝?..</div>
+      <div class="status" id="connectionStatus">連線中...</div>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-view="displayView">憿舐內??/button>
-      <button class="tab" data-view="counterView">瑹??/button>
-      <button class="tab" data-view="kitchenView">鋆賭???/button>
-      <button class="tab" data-view="manageView">蝞∠???/button>
+      <button class="tab active" data-view="displayView">顯示頁</button>
+      <button class="tab" data-view="counterView">櫃台頁</button>
+      <button class="tab" data-view="kitchenView">製作頁</button>
+      <button class="tab" data-view="manageView">管理頁</button>
     </div>
 
     <section class="view active" id="displayView">
       <div class="heroGrid">
         <div class="card displayHero">
-          <div><div class="muted">?桀??怨?</div><div class="big" id="currentPickupDisplay">--</div></div>
+          <div>
+            <div class="muted">目前叫號</div>
+            <div class="big" id="currentPickupDisplay">--</div>
+          </div>
         </div>
         <div class="card">
-          <div class="section"><h2>蝑???</h2><span class="muted" id="waitingCount">0 蝑?/span></div>
+          <div class="section">
+            <h2>等待取餐</h2>
+            <span class="muted" id="waitingCount">0 筆</span>
+          </div>
           <div class="chips" id="waitingList"></div>
         </div>
       </div>
@@ -63,25 +110,52 @@
     <section class="view" id="counterView">
       <div class="counterGrid">
         <div class="card">
-          <div class="section"><h2>瑹暺?</h2><span class="muted">?詨????酉?捱摰?血??/span></div>
-          <div id="counterGate" class="notice">隢??餃瑹撣唾???/div>
+          <div class="section">
+            <h2>櫃台點餐</h2>
+            <span class="muted">選商品、加備註、決定是否叫號</span>
+          </div>
+          <div id="counterGate" class="notice">請先登入櫃台帳號。</div>
           <div id="counterContent" style="display:none">
             <div class="two">
-              <div class="group"><div class="section"><h3>憌脫??</h3><span class="muted">?批</span></div><div class="list" id="drinkProducts"></div></div>
-              <div class="group"><div class="section"><h3>?啣??</h3><span class="muted">?啣?</span></div><div class="list" id="iceProducts"></div></div>
+              <div class="group">
+                <div class="section">
+                  <h3>飲料區</h3>
+                  <span class="muted">吧台</span>
+                </div>
+                <div class="list" id="drinkProducts"></div>
+              </div>
+              <div class="group">
+                <div class="section">
+                  <h3>冰品區</h3>
+                  <span class="muted">冰區</span>
+                </div>
+                <div class="list" id="iceProducts"></div>
+              </div>
             </div>
             <div class="card" style="margin-top:16px;padding:16px">
-              <div class="section"><h3>閮??</h3><span class="muted" id="summaryCount">0 ??/span></div>
+              <div class="section">
+                <h3>訂單摘要</h3>
+                <span class="muted" id="summaryCount">0 項</span>
+              </div>
               <div class="stack" id="orderSummary"></div>
               <div class="switch" style="margin-top:14px">
-                <div><strong>?閬?擗?</strong><div class="muted">?暸敺???A001</div></div>
+                <div>
+                  <strong>需要取餐號</strong>
+                  <div class="muted">勾選後自動產生 A001</div>
+                </div>
                 <input type="checkbox" class="toggle" id="needsPickupToggle" />
               </div>
-              <div style="margin-top:14px"><label for="orderNote">?酉</label><textarea id="orderNote" placeholder="靘?嚗??啜????></textarea></div>
-              <div class="total" style="margin-top:14px">閮蝮賢<strong id="totalAmount">$0</strong></div>
+              <div style="margin-top:14px">
+                <label for="orderNote">備註</label>
+                <textarea id="orderNote" placeholder="例如：少冰、冰品先做"></textarea>
+              </div>
+              <div class="total" style="margin-top:14px">
+                訂單總價
+                <strong id="totalAmount">$0</strong>
+              </div>
               <div class="btns" style="margin-top:14px">
-                <button class="btn primary" id="createOrderBtn">撱箇?閮</button>
-                <button class="btn secondary" id="clearOrderBtn">皜征?砍</button>
+                <button class="btn primary" id="createOrderBtn">建立訂單</button>
+                <button class="btn secondary" id="clearOrderBtn">清空本單</button>
               </div>
             </div>
           </div>
@@ -89,30 +163,39 @@
 
         <div class="stack">
           <div class="card">
-            <div class="section"><h2>瑹?餃</h2><span class="muted" id="loginStateText">撠?餃</span></div>
+            <div class="section">
+              <h2>櫃台登入</h2>
+              <span class="muted" id="loginStateText">尚未登入</span>
+            </div>
             <div class="stack">
-              <input id="passwordInput" type="password" placeholder="頛詨瑹撖Ⅳ" />
-              <button class="btn primary" id="loginBtn">?餃瑹</button>
-              <button class="btn secondary" id="logoutBtn" style="display:none">?餃</button>
+              <input id="passwordInput" type="password" placeholder="輸入櫃台密碼" />
+              <button class="btn primary" id="loginBtn">登入櫃台</button>
+              <button class="btn secondary" id="logoutBtn" style="display:none">登出</button>
               <div class="muted" id="loginMessage"></div>
             </div>
           </div>
           <div class="card">
-            <div class="section"><h2>?怨???</h2><span class="muted">?芸??擗?????/span></div>
+            <div class="section">
+              <h2>叫號操作</h2>
+              <span class="muted">只叫有取餐號的訂單</span>
+            </div>
             <div class="two">
-              <div class="metric"><span class="muted">?桀??怨?</span><strong id="counterCurrentPickup">--</strong></div>
-              <div class="metric"><span class="muted">蝑??賊?</span><strong id="counterWaitingCount">0</strong></div>
+              <div class="metric"><span class="muted">目前叫號</span><strong id="counterCurrentPickup">--</strong></div>
+              <div class="metric"><span class="muted">等待數量</span><strong id="counterWaitingCount">0</strong></div>
             </div>
             <div class="btns" style="margin-top:14px">
-              <button class="btn primary" id="callNextBtn">?思?銝??/button>
-              <button class="btn danger" id="resetCallingBtn">??怨?</button>
+              <button class="btn primary" id="callNextBtn">叫下一號</button>
+              <button class="btn danger" id="resetCallingBtn">重整叫號</button>
             </div>
           </div>
           <div class="card">
-            <div class="section"><h2>隞?</h2><span class="muted">瑹敹恍?</span></div>
+            <div class="section">
+              <h2>今日速報</h2>
+              <span class="muted">櫃台快速看</span>
+            </div>
             <div class="two">
-              <div class="metric"><span class="muted">隞?</span><strong id="quickRevenue">$0</strong></div>
-              <div class="metric"><span class="muted">隞閮</span><strong id="quickOrders">0</strong></div>
+              <div class="metric"><span class="muted">今日營收</span><strong id="quickRevenue">$0</strong></div>
+              <div class="metric"><span class="muted">今日訂單</span><strong id="quickOrders">0</strong></div>
             </div>
           </div>
         </div>
@@ -121,28 +204,58 @@
 
     <section class="view" id="kitchenView">
       <div class="card">
-        <div class="section"><h2>鋆賭??</h2><span class="muted">憌脫?????</span></div>
-        <div id="kitchenGate" class="notice">鋆賭???閬??餃瑹撣唾???/div>
+        <div class="section">
+          <h2>製作看板</h2>
+          <span class="muted">飲料和冰品分區</span>
+        </div>
+        <div id="kitchenGate" class="notice">製作頁需要先登入櫃台帳號。</div>
         <div id="kitchenContent" class="board" style="display:none">
-          <div class="card"><div class="section"><h3>憌脫??</h3><span class="muted" id="drinkOrderCount">0 撘?/span></div><div class="stack" id="drinkOrders"></div></div>
-          <div class="card"><div class="section"><h3>?啣??</h3><span class="muted" id="iceOrderCount">0 撘?/span></div><div class="stack" id="iceOrders"></div></div>
+          <div class="card">
+            <div class="section">
+              <h3>飲料區</h3>
+              <span class="muted" id="drinkOrderCount">0 張</span>
+            </div>
+            <div class="stack" id="drinkOrders"></div>
+          </div>
+          <div class="card">
+            <div class="section">
+              <h3>冰品區</h3>
+              <span class="muted" id="iceOrderCount">0 張</span>
+            </div>
+            <div class="stack" id="iceOrders"></div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="view" id="manageView">
       <div class="card">
-        <div class="section"><h2>隞蝞∠?</h2><span class="muted">?芾?閮蝮賢</span></div>
-        <div id="manageGate" class="notice">蝞∠???閬??餃瑹撣唾???/div>
+        <div class="section">
+          <h2>今日管理</h2>
+          <span class="muted">只記訂單總價</span>
+        </div>
+        <div id="manageGate" class="notice">管理頁需要先登入櫃台帳號。</div>
         <div id="manageContent" style="display:none">
           <div class="four">
-            <div class="metric"><span class="muted">隞?</span><strong id="statRevenue">$0</strong></div>
-            <div class="metric"><span class="muted">隞閮</span><strong id="statOrders">0</strong></div>
-            <div class="metric"><span class="muted">敺ˊ雿?/span><strong id="statPending">0</strong></div>
-            <div class="metric"><span class="muted">鋆賭?銝?/span><strong id="statPreparing">0</strong></div>
+            <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
+            <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
+            <div class="metric"><span class="muted">待製作</span><strong id="statPending">0</strong></div>
+            <div class="metric"><span class="muted">製作中</span><strong id="statPreparing">0</strong></div>
           </div>
-          <div class="card" style="margin-top:16px;padding:16px"><div class="section"><h3>???琿?</h3><span class="muted">靘?箸??摨?/span></div><div id="salesTableWrap"></div></div>
-          <div class="card" style="margin-top:16px;padding:16px"><div class="section"><h3>閮?”</h3><span class="muted">?臬?瘨摰?閮</span></div><div id="ordersTableWrap"></div></div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section">
+              <h3>商品銷量</h3>
+              <span class="muted">依售出數量排序</span>
+            </div>
+            <div id="salesTableWrap"></div>
+          </div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section">
+              <h3>訂單列表</h3>
+              <span class="muted">可取消未完成訂單</span>
+            </div>
+            <div id="ordersTableWrap"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -170,8 +283,15 @@
     const time = v => new Date(v).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
     const authHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${state.token}` });
 
-    function setConnection(text, ok = true) { $("connectionStatus").textContent = text; $("connectionStatus").style.color = ok ? "var(--ok)" : "var(--danger)"; }
-    function switchView(id) { tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.view === id)); document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === id)); }
+    function setConnection(text, ok = true) {
+      $("connectionStatus").textContent = text;
+      $("connectionStatus").style.color = ok ? "var(--ok)" : "var(--danger)";
+    }
+
+    function switchView(id) {
+      tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.view === id));
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === id));
+    }
 
     function setAuthUi(isLoggedIn, message = "") {
       $("counterGate").style.display = isLoggedIn ? "none" : "block";
@@ -183,10 +303,16 @@
       $("loginStateText").textContent = isLoggedIn ? "已登入" : "尚未登入";
       $("loginMessage").textContent = message;
       $("logoutBtn").style.display = isLoggedIn ? "inline-flex" : "none";
-      tabs.forEach(tab => { if (protectedViews.has(tab.dataset.view)) tab.style.opacity = isLoggedIn ? "1" : "0.45"; });
+      tabs.forEach(tab => {
+        if (protectedViews.has(tab.dataset.view)) tab.style.opacity = isLoggedIn ? "1" : "0.45";
+      });
     }
 
-    function logout(message) { state.token = ""; setAuthUi(false, message); switchView("displayView"); }
+    function logout(message) {
+      state.token = "";
+      setAuthUi(false, message);
+      switchView("displayView");
+    }
 
     async function request(path, options = {}) {
       const res = await fetch(api(path), options);
@@ -211,12 +337,19 @@
       $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 筆`;
       const wrap = $("waitingList");
       wrap.innerHTML = publicState.waitingPickupNumbers.length ? "" : '<div class="chip empty">目前沒有等待號碼</div>';
-      publicState.waitingPickupNumbers.forEach(number => { const chip = document.createElement("div"); chip.className = "chip"; chip.textContent = number; wrap.appendChild(chip); });
+      publicState.waitingPickupNumbers.forEach(number => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = number;
+        wrap.appendChild(chip);
+      });
     }
 
     function renderProducts() {
-      const drinkWrap = $("drinkProducts"), iceWrap = $("iceProducts");
-      drinkWrap.innerHTML = ""; iceWrap.innerHTML = "";
+      const drinkWrap = $("drinkProducts");
+      const iceWrap = $("iceProducts");
+      drinkWrap.innerHTML = "";
+      iceWrap.innerHTML = "";
       state.products.forEach(product => {
         const qty = cart.get(product.id) || 0;
         const card = document.createElement("div");
@@ -225,7 +358,8 @@
         card.querySelectorAll("button").forEach(button => button.addEventListener("click", () => {
           const next = (cart.get(product.id) || 0) + (button.dataset.op === "plus" ? 1 : -1);
           if (next <= 0) cart.delete(product.id); else cart.set(product.id, next);
-          renderProducts(); renderSummary();
+          renderProducts();
+          renderSummary();
         }));
         (product.category === "drink" ? drinkWrap : iceWrap).appendChild(card);
       });
@@ -236,10 +370,15 @@
       const items = state.products.filter(product => cart.has(product.id)).map(product => ({ ...product, quantity: cart.get(product.id) }));
       $("summaryCount").textContent = `${items.length} 項`;
       wrap.innerHTML = "";
-      if (!items.length) { wrap.innerHTML = '<div class="empty">還沒有加入任何品項</div>'; $("totalAmount").textContent = "$0"; return; }
+      if (!items.length) {
+        wrap.innerHTML = '<div class="empty">還沒有加入任何品項</div>';
+        $("totalAmount").textContent = "$0";
+        return;
+      }
       let total = 0;
       items.forEach(item => {
-        const subtotal = item.price * item.quantity; total += subtotal;
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
         const row = document.createElement("div");
         row.className = "summaryRow";
         row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">${item.category === "drink" ? "飲料" : "冰品"}</div></div><div>x ${item.quantity}</div><div>${money(subtotal)}</div>`;
@@ -248,7 +387,9 @@
       $("totalAmount").textContent = money(total);
     }
 
-    function statusText(status) { return { pending: "待製作", preparing: "製作中", done: "完成", cancelled: "已取消" }[status] || status; }
+    function statusText(status) {
+      return { pending: "待製作", preparing: "製作中", done: "完成", cancelled: "已取消" }[status] || status;
+    }
 
     function buildKitchenCard(order, category) {
       const items = order.items.filter(item => item.category === category);
@@ -261,26 +402,42 @@
       actions.style.marginTop = "10px";
       actions.innerHTML = '<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">完成</button>';
       actions.querySelectorAll("button").forEach(button => button.addEventListener("click", async () => {
-        try { await request(`/api/orders/${order.orderId}/status`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ status: button.dataset.status }) }); await loadAdminState(); } catch (error) { alert(error.message); }
+        try {
+          await request(`/api/orders/${order.orderId}/status`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ status: button.dataset.status }) });
+          await loadAdminState();
+        } catch (error) {
+          alert(error.message);
+        }
       }));
       card.appendChild(actions);
       return card;
     }
 
     function renderKitchen() {
-      const drinkWrap = $("drinkOrders"), iceWrap = $("iceOrders");
-      drinkWrap.innerHTML = ""; iceWrap.innerHTML = "";
-      let drinkCount = 0, iceCount = 0;
+      const drinkWrap = $("drinkOrders");
+      const iceWrap = $("iceOrders");
+      drinkWrap.innerHTML = "";
+      iceWrap.innerHTML = "";
+      let drinkCount = 0;
+      let iceCount = 0;
       state.orders.filter(order => order.status !== "done" && order.status !== "cancelled").forEach(order => {
-        const d = buildKitchenCard(order, "drink"), i = buildKitchenCard(order, "ice");
-        if (d) { drinkWrap.appendChild(d); drinkCount++; }
-        if (i) { iceWrap.appendChild(i); iceCount++; }
+        const drinkCard = buildKitchenCard(order, "drink");
+        const iceCard = buildKitchenCard(order, "ice");
+        if (drinkCard) {
+          drinkWrap.appendChild(drinkCard);
+          drinkCount += 1;
+        }
+        if (iceCard) {
+          iceWrap.appendChild(iceCard);
+          iceCount += 1;
+        }
       });
       if (!drinkCount) drinkWrap.innerHTML = '<div class="empty">目前沒有飲料訂單</div>';
       if (!iceCount) iceWrap.innerHTML = '<div class="empty">目前沒有冰品訂單</div>';
       $("drinkOrderCount").textContent = `${drinkCount} 張`;
       $("iceOrderCount").textContent = `${iceCount} 張`;
     }
+
     function renderStats() {
       $("counterCurrentPickup").textContent = state.calling.currentPickupNumber || "--";
       $("counterWaitingCount").textContent = state.calling.waitingPickupNumbers.length;
@@ -294,18 +451,35 @@
 
     function renderSales() {
       const rows = state.stats.productSales || [];
-      $("salesTableWrap").innerHTML = rows.length ? `<table><thead><tr><th>品項</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>` : '<div class="empty">今天還沒有銷售資料</div>';
+      $("salesTableWrap").innerHTML = rows.length
+        ? `<table><thead><tr><th>品項</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">今天還沒有銷售資料</div>';
     }
 
     function renderOrders() {
-      $("ordersTableWrap").innerHTML = state.orders.length ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map(order => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map(item => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" ? '<span class="muted">無</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>` : '<div class="empty">還沒有訂單</div>';
+      $("ordersTableWrap").innerHTML = state.orders.length
+        ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map(order => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map(item => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" ? '<span class="muted">無</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">還沒有訂單</div>';
       document.querySelectorAll("[data-order-id]").forEach(button => button.addEventListener("click", async () => {
         if (!confirm("確定要取消這張訂單嗎？")) return;
-        try { await request(`/api/orders/${button.dataset.orderId}/cancel`, { method: "POST", headers: authHeaders() }); await loadAdminState(); } catch (error) { alert(error.message); }
+        try {
+          await request(`/api/orders/${button.dataset.orderId}/cancel`, { method: "POST", headers: authHeaders() });
+          await loadAdminState();
+        } catch (error) {
+          alert(error.message);
+        }
       }));
     }
 
-    function renderAdmin() { if (!state.token) return; renderProducts(); renderSummary(); renderStats(); renderKitchen(); renderSales(); renderOrders(); }
+    function renderAdmin() {
+      if (!state.token) return;
+      renderProducts();
+      renderSummary();
+      renderStats();
+      renderKitchen();
+      renderSales();
+      renderOrders();
+    }
 
     async function loadPublicState() {
       const response = await fetch(api("/api/public-state"));
@@ -317,30 +491,90 @@
     async function loadAdminState() {
       if (!state.token) return;
       const data = await request("/api/admin-state", { headers: { Authorization: `Bearer ${state.token}` } });
-      state.products = data.products; state.orders = data.orders; state.calling = data.calling; state.stats = data.stats;
+      state.products = data.products;
+      state.orders = data.orders;
+      state.calling = data.calling;
+      state.stats = data.stats;
       setAuthUi(true, "已登入櫃台");
       renderAdmin();
     }
 
     async function refresh() {
-      try { await loadPublicState(); if (state.token) await loadAdminState(); setConnection("系統已連線", true); }
-      catch (error) { setConnection(error.message, false); }
+      try {
+        await loadPublicState();
+        if (state.token) await loadAdminState();
+        setConnection("系統已連線", true);
+      } catch (error) {
+        setConnection(error.message, false);
+      }
     }
 
     $("loginBtn").addEventListener("click", async () => {
-      try { const data = await request("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: $("passwordInput").value }) }); state.token = data.token; $("passwordInput").value = ""; await loadAdminState(); }
-      catch (error) { setAuthUi(false, error.message); }
+      try {
+        const data = await request("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: $("passwordInput").value })
+        });
+        state.token = data.token;
+        $("passwordInput").value = "";
+        await loadAdminState();
+      } catch (error) {
+        setAuthUi(false, error.message);
+      }
     });
+
     $("logoutBtn").addEventListener("click", () => logout("已登出"));
+
     $("createOrderBtn").addEventListener("click", async () => {
       const items = [...cart.entries()].map(([productId, quantity]) => ({ productId, quantity }));
       if (!items.length) return alert("請先加入品項");
-      try { await request("/api/orders", { method: "POST", headers: authHeaders(), body: JSON.stringify({ items, note: $("orderNote").value, needsPickupNumber: $("needsPickupToggle").checked }) }); cart.clear(); $("orderNote").value = ""; $("needsPickupToggle").checked = false; renderProducts(); renderSummary(); await refresh(); }
-      catch (error) { alert(error.message); }
+      try {
+        await request("/api/orders", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            items,
+            note: $("orderNote").value,
+            needsPickupNumber: $("needsPickupToggle").checked
+          })
+        });
+        cart.clear();
+        $("orderNote").value = "";
+        $("needsPickupToggle").checked = false;
+        renderProducts();
+        renderSummary();
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
     });
-    $("clearOrderBtn").addEventListener("click", () => { cart.clear(); $("orderNote").value = ""; $("needsPickupToggle").checked = false; renderProducts(); renderSummary(); });
-    $("callNextBtn").addEventListener("click", async () => { try { await request("/api/call-next", { method: "POST", headers: authHeaders() }); await refresh(); } catch (error) { alert(error.message); } });
-    $("resetCallingBtn").addEventListener("click", async () => { try { await request("/api/reset-calling", { method: "POST", headers: authHeaders() }); await refresh(); } catch (error) { alert(error.message); } });
+
+    $("clearOrderBtn").addEventListener("click", () => {
+      cart.clear();
+      $("orderNote").value = "";
+      $("needsPickupToggle").checked = false;
+      renderProducts();
+      renderSummary();
+    });
+
+    $("callNextBtn").addEventListener("click", async () => {
+      try {
+        await request("/api/call-next", { method: "POST", headers: authHeaders() });
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("resetCallingBtn").addEventListener("click", async () => {
+      try {
+        await request("/api/reset-calling", { method: "POST", headers: authHeaders() });
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
 
     async function init() {
       setAuthUi(false, "");

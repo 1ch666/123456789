@@ -187,7 +187,7 @@
               <div class="muted" id="loginMessage"></div>
             </div>
           </div>
-          <div class="card">
+          <div class="card" id="callingControlsCard" style="display:none">
             <div class="section">
               <h2>叫號控制</h2>
               <span class="muted">只會叫到有取餐號的訂單</span>
@@ -214,7 +214,7 @@
               <div class="chips" id="calledHistory"></div>
             </div>
           </div>
-          <div class="card">
+          <div class="card" id="quickStatsCard" style="display:none">
             <div class="section">
               <h2>今日快速統計</h2>
               <span class="muted">櫃台可即時查看</span>
@@ -329,6 +329,8 @@
     function setAuthUi(isLoggedIn, message = "") {
       $("counterGate").style.display = isLoggedIn ? "none" : "block";
       $("counterContent").style.display = isLoggedIn ? "block" : "none";
+      $("callingControlsCard").style.display = isLoggedIn ? "block" : "none";
+      $("quickStatsCard").style.display = isLoggedIn ? "block" : "none";
       $("kitchenGate").style.display = isLoggedIn ? "none" : "block";
       $("kitchenContent").style.display = isLoggedIn ? "grid" : "none";
       $("manageGate").style.display = isLoggedIn ? "none" : "block";

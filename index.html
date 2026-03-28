@@ -1,75 +1,86 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>飲料冰品店點餐系統</title>
   <style>
-    :root{--bg:#f6efe4;--card:#fff9f1;--ink:#2b241e;--muted:#73675f;--line:#e5d6c2;--accent:#c46a18;--drink:#155e75;--ice:#0f766e;--danger:#b42318;--ok:#166534}
+    :root{
+      --bg:#f7f1e8;
+      --card:#fffaf2;
+      --ink:#2b241e;
+      --muted:#6f655d;
+      --line:#e6d8c6;
+      --accent:#b85c16;
+      --accent-2:#7c3f10;
+      --drink:#155e75;
+      --ice:#0f766e;
+      --danger:#b42318;
+      --ok:#166534;
+      --shadow:0 12px 26px rgba(74,45,14,.08);
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#faf4ea,#efe0c8);color:var(--ink)}
-    .app{max-width:1440px;margin:0 auto;padding:22px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-    .title h1{margin:0;font-size:30px}
-    .title p{margin:6px 0 0;color:var(--muted)}
-    .status{padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:#fff8ec;color:var(--muted)}
-    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
-    .tab{border:0;border-radius:999px;padding:12px 16px;background:#fff7eb;cursor:pointer}
+    body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#fbf5eb,#efe1cb);color:var(--ink)}
+    .app{max-width:1440px;margin:0 auto;padding:24px}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+    .title h1{margin:0;font-size:32px}
+    .title p{margin:8px 0 0;color:var(--muted)}
+    .pill{padding:10px 14px;border-radius:999px;background:#fff7ec;border:1px solid var(--line);color:var(--muted)}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+    .tab{border:0;border-radius:999px;padding:12px 18px;background:#fff7eb;color:var(--ink);cursor:pointer;font:inherit;font-weight:700}
     .tab.active{background:var(--accent);color:#fff}
     .view{display:none}
     .view.active{display:block}
-    .card{background:rgba(255,249,241,.95);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 28px rgba(72,44,12,.08)}
-    .heroGrid,.counterGrid,.board,.two,.four{display:grid;gap:16px}
-    .heroGrid{grid-template-columns:1.15fr 1fr}
-    .counterGrid{grid-template-columns:1.15fr .95fr}
-    .board,.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{display:grid;gap:16px}
+    .grid-hero{grid-template-columns:1.1fr 1fr}
+    .grid-counter{grid-template-columns:1.15fr .95fr}
+    .grid-board,.grid-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{background:rgba(255,250,242,.95);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
     .section{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
     .section h2,.section h3{margin:0}
     .muted{font-size:14px;color:var(--muted)}
-    .displayHero{min-height:250px;display:grid;place-items:center;text-align:center}
-    .displayHero .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
-    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px}
-    .chip{min-height:78px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}
-    .chip.empty{font-size:18px;color:var(--muted)}
-    .stack,.list{display:grid;gap:12px}
+    .displayHero{min-height:260px;display:grid;place-items:center;text-align:center}
+    .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
+    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+    .chip{min-height:80px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}
+    .empty{padding:20px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted);background:#fffaf6}
+    .list,.stack{display:grid;gap:12px}
     .group{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fffdf9}
-    .item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
     .qty{display:flex;align-items:center;gap:8px}
-    .qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer}
+    .qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer;font-weight:900}
     .qty span{min-width:30px;text-align:center;font-weight:800}
     .summaryRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .empty{padding:22px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted)}
-    .total{padding:16px;border-radius:18px;background:#fde8c4}
-    .total strong{display:block;font-size:38px;margin-top:6px}
     .switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
     .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}
     .toggle:checked{background:var(--accent)}
     .toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
     .toggle:checked:after{transform:translateX(26px)}
     input,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit}
-    textarea{min-height:90px;resize:vertical}
+    textarea{min-height:88px;resize:vertical}
     .btns{display:flex;flex-wrap:wrap;gap:10px}
-    .btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit}
+    .btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit;font-weight:700}
     .primary{background:var(--accent);color:#fff}
     .secondary{background:#fff;border:1px solid var(--line)}
     .drink{background:rgba(21,94,117,.12);color:var(--drink)}
+    .ice{background:rgba(15,118,110,.12);color:var(--ice)}
     .ok{background:rgba(22,101,52,.12);color:var(--ok)}
     .danger{background:rgba(180,35,24,.12);color:var(--danger)}
     .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
     .metric strong{display:block;font-size:30px;margin-top:8px}
+    .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
     .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
-    .orderHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .orderHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
     .orderId{font-size:24px;font-weight:900}
     .tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
     .tag{padding:5px 10px;border-radius:999px;background:#f3e7d3;font-size:12px}
     .note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}
-    .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
     table{width:100%;border-collapse:collapse}
     th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-    th{color:var(--muted);font-weight:600}
-    @media (max-width:1100px){.heroGrid,.counterGrid,.board,.two,.four{grid-template-columns:1fr}}
-    @media (max-width:720px){.top{flex-direction:column;align-items:flex-start}.summaryRow{grid-template-columns:1fr}}
+    th{color:var(--muted);font-weight:700}
+    @media (max-width:1100px){.grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{grid-template-columns:1fr}}
+    @media (max-width:720px){.top{flex-direction:column}.summaryRow{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -77,9 +88,9 @@
     <div class="top">
       <div class="title">
         <h1>飲料冰品店點餐系統</h1>
-        <p>櫃台點餐、取餐叫號、製作看板、今日營收</p>
+        <p>櫃台點餐、取餐叫號、製作看板、今日記帳都集中在同一頁面。</p>
       </div>
-      <div class="status" id="connectionStatus">連線中...</div>
+      <div class="pill" id="connectionStatus">連線中...</div>
     </div>
 
     <div class="tabs">
@@ -90,7 +101,7 @@
     </div>
 
     <section class="view active" id="displayView">
-      <div class="heroGrid">
+      <div class="grid-hero">
         <div class="card displayHero">
           <div>
             <div class="muted">目前叫號</div>
@@ -99,8 +110,8 @@
         </div>
         <div class="card">
           <div class="section">
-            <h2>等待取餐</h2>
-            <span class="muted" id="waitingCount">0 筆</span>
+            <h2>等待中的號碼</h2>
+            <span class="muted" id="waitingCount">0 組</span>
           </div>
           <div class="chips" id="waitingList"></div>
         </div>
@@ -108,54 +119,54 @@
     </section>
 
     <section class="view" id="counterView">
-      <div class="counterGrid">
+      <div class="grid-counter">
         <div class="card">
           <div class="section">
             <h2>櫃台點餐</h2>
-            <span class="muted">選商品、加備註、決定是否叫號</span>
+            <span class="muted">登入後即可建立訂單、叫號與查看即時統計。</span>
           </div>
-          <div id="counterGate" class="notice">請先登入櫃台帳號。</div>
+          <div id="counterGate" class="notice">請先在右側輸入櫃台密碼登入。</div>
           <div id="counterContent" style="display:none">
-            <div class="two">
+            <div class="grid-two">
               <div class="group">
                 <div class="section">
                   <h3>飲料區</h3>
-                  <span class="muted">吧台</span>
+                  <span class="muted">點一下加減數量</span>
                 </div>
                 <div class="list" id="drinkProducts"></div>
               </div>
               <div class="group">
                 <div class="section">
                   <h3>冰品區</h3>
-                  <span class="muted">冰區</span>
+                  <span class="muted">支援混合訂單</span>
                 </div>
                 <div class="list" id="iceProducts"></div>
               </div>
             </div>
             <div class="card" style="margin-top:16px;padding:16px">
               <div class="section">
-                <h3>訂單摘要</h3>
+                <h3>訂單明細</h3>
                 <span class="muted" id="summaryCount">0 項</span>
               </div>
               <div class="stack" id="orderSummary"></div>
               <div class="switch" style="margin-top:14px">
                 <div>
                   <strong>需要取餐號</strong>
-                  <div class="muted">勾選後自動產生 A001</div>
+                  <div class="muted">開啟後會自動產生 A001 形式號碼</div>
                 </div>
                 <input type="checkbox" class="toggle" id="needsPickupToggle" />
               </div>
               <div style="margin-top:14px">
                 <label for="orderNote">備註</label>
-                <textarea id="orderNote" placeholder="例如：少冰、冰品先做"></textarea>
+                <textarea id="orderNote" placeholder="例如：少冰、不要煉乳、分開裝"></textarea>
               </div>
-              <div class="total" style="margin-top:14px">
+              <div class="card" style="margin-top:14px;padding:16px;background:#fde8c4">
                 訂單總價
-                <strong id="totalAmount">$0</strong>
+                <strong id="totalAmount" style="display:block;font-size:38px;margin-top:6px">$0</strong>
               </div>
               <div class="btns" style="margin-top:14px">
                 <button class="btn primary" id="createOrderBtn">建立訂單</button>
-                <button class="btn secondary" id="clearOrderBtn">清空本單</button>
+                <button class="btn secondary" id="clearOrderBtn">清空內容</button>
               </div>
             </div>
           </div>
@@ -169,31 +180,33 @@
             </div>
             <div class="stack">
               <input id="passwordInput" type="password" placeholder="輸入櫃台密碼" />
-              <button class="btn primary" id="loginBtn">登入櫃台</button>
-              <button class="btn secondary" id="logoutBtn" style="display:none">登出</button>
+              <div class="btns">
+                <button class="btn primary" id="loginBtn">登入櫃台</button>
+                <button class="btn secondary" id="logoutBtn" style="display:none">登出</button>
+              </div>
               <div class="muted" id="loginMessage"></div>
             </div>
           </div>
           <div class="card">
             <div class="section">
-              <h2>叫號操作</h2>
-              <span class="muted">只叫有取餐號的訂單</span>
+              <h2>叫號控制</h2>
+              <span class="muted">只會叫到有取餐號的訂單</span>
             </div>
-            <div class="two">
+            <div class="grid-two">
               <div class="metric"><span class="muted">目前叫號</span><strong id="counterCurrentPickup">--</strong></div>
               <div class="metric"><span class="muted">等待數量</span><strong id="counterWaitingCount">0</strong></div>
             </div>
             <div class="btns" style="margin-top:14px">
               <button class="btn primary" id="callNextBtn">叫下一號</button>
-              <button class="btn danger" id="resetCallingBtn">重整叫號</button>
+              <button class="btn danger" id="resetCallingBtn">重設叫號</button>
             </div>
           </div>
           <div class="card">
             <div class="section">
-              <h2>今日速報</h2>
-              <span class="muted">櫃台快速看</span>
+              <h2>今日快速統計</h2>
+              <span class="muted">櫃台可即時查看</span>
             </div>
-            <div class="two">
+            <div class="grid-two">
               <div class="metric"><span class="muted">今日營收</span><strong id="quickRevenue">$0</strong></div>
               <div class="metric"><span class="muted">今日訂單</span><strong id="quickOrders">0</strong></div>
             </div>
@@ -206,21 +219,21 @@
       <div class="card">
         <div class="section">
           <h2>製作看板</h2>
-          <span class="muted">飲料和冰品分區</span>
+          <span class="muted">飲料和冰品分區顯示，同一筆混合訂單會同步出現。</span>
         </div>
-        <div id="kitchenGate" class="notice">製作頁需要先登入櫃台帳號。</div>
-        <div id="kitchenContent" class="board" style="display:none">
+        <div id="kitchenGate" class="notice">登入後可操作製作狀態。</div>
+        <div id="kitchenContent" class="grid-board" style="display:none">
           <div class="card">
             <div class="section">
               <h3>飲料區</h3>
-              <span class="muted" id="drinkOrderCount">0 張</span>
+              <span class="muted" id="drinkOrderCount">0 單</span>
             </div>
             <div class="stack" id="drinkOrders"></div>
           </div>
           <div class="card">
             <div class="section">
               <h3>冰品區</h3>
-              <span class="muted" id="iceOrderCount">0 張</span>
+              <span class="muted" id="iceOrderCount">0 單</span>
             </div>
             <div class="stack" id="iceOrders"></div>
           </div>
@@ -231,12 +244,12 @@
     <section class="view" id="manageView">
       <div class="card">
         <div class="section">
-          <h2>今日管理</h2>
-          <span class="muted">只記訂單總價</span>
+          <h2>管理統計</h2>
+          <span class="muted">今日營收、各商品銷量、訂單狀態總覽。</span>
         </div>
-        <div id="manageGate" class="notice">管理頁需要先登入櫃台帳號。</div>
+        <div id="manageGate" class="notice">登入後可查看管理資料。</div>
         <div id="manageContent" style="display:none">
-          <div class="four">
+          <div class="grid-four">
             <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
             <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
             <div class="metric"><span class="muted">待製作</span><strong id="statPending">0</strong></div>
@@ -244,15 +257,15 @@
           </div>
           <div class="card" style="margin-top:16px;padding:16px">
             <div class="section">
-              <h3>商品銷量</h3>
+              <h3>商品銷售統計</h3>
               <span class="muted">依售出數量排序</span>
             </div>
             <div id="salesTableWrap"></div>
           </div>
           <div class="card" style="margin-top:16px;padding:16px">
             <div class="section">
-              <h3>訂單列表</h3>
-              <span class="muted">可取消未完成訂單</span>
+              <h3>今日訂單列表</h3>
+              <span class="muted">未完成訂單可直接取消</span>
             </div>
             <div id="ordersTableWrap"></div>
           </div>
@@ -263,34 +276,41 @@
 
   <script>
     const apiParam = new URLSearchParams(window.location.search).get("api");
-    if (apiParam) localStorage.setItem("apiBaseUrl", apiParam);
-    localStorage.removeItem("adminToken");
+    if (apiParam) {
+      localStorage.setItem("apiBaseUrl", apiParam);
+    }
 
     const defaultApiBase = window.location.protocol.startsWith("http")
       ? window.location.origin
       : "http://localhost:3000";
+
     const API_BASE = localStorage.getItem("apiBaseUrl") || defaultApiBase;
     const tabs = [...document.querySelectorAll(".tab")];
-    const protectedViews = new Set(["counterView", "kitchenView", "manageView"]);
-    const state = { token: "", products: [], orders: [], calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] }, stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] } };
+    const state = {
+      token: "",
+      products: [],
+      orders: [],
+      calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] },
+      stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] }
+    };
     const publicState = { currentPickupNumber: null, waitingPickupNumbers: [] };
     const cart = new Map();
-    let refreshTimer = null;
 
-    const $ = id => document.getElementById(id);
-    const api = path => `${API_BASE}${path}`;
-    const money = n => `$${Number(n || 0).toLocaleString("zh-TW")}`;
-    const time = v => new Date(v).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+    const $ = (id) => document.getElementById(id);
+    const api = (path) => `${API_BASE}${path}`;
+    const money = (value) => `$${Number(value || 0).toLocaleString("zh-TW")}`;
+    const time = (value) => new Date(value).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
     const authHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${state.token}` });
 
     function setConnection(text, ok = true) {
-      $("connectionStatus").textContent = text;
-      $("connectionStatus").style.color = ok ? "var(--ok)" : "var(--danger)";
+      const el = $("connectionStatus");
+      el.textContent = text;
+      el.style.color = ok ? "var(--ok)" : "var(--danger)";
     }
 
     function switchView(id) {
-      tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.view === id));
-      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === id));
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === id));
+      document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === id));
     }
 
     function setAuthUi(isLoggedIn, message = "") {
@@ -303,41 +323,46 @@
       $("loginStateText").textContent = isLoggedIn ? "已登入" : "尚未登入";
       $("loginMessage").textContent = message;
       $("logoutBtn").style.display = isLoggedIn ? "inline-flex" : "none";
-      tabs.forEach(tab => {
-        if (protectedViews.has(tab.dataset.view)) tab.style.opacity = isLoggedIn ? "1" : "0.45";
+      tabs.forEach((tab) => {
+        if (tab.dataset.view !== "displayView") {
+          tab.style.opacity = isLoggedIn ? "1" : "0.8";
+        }
       });
     }
 
-    function logout(message) {
+    function logout(message = "已登出") {
       state.token = "";
       setAuthUi(false, message);
-      switchView("displayView");
+      renderAdmin();
     }
 
     async function request(path, options = {}) {
-      const res = await fetch(api(path), options);
-      const data = await res.json().catch(() => ({}));
-      if (res.status === 401) logout("登入已失效，請重新登入");
-      if (!res.ok) throw new Error(data.message || "操作失敗");
+      const response = await fetch(api(path), options);
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        logout("登入已失效，請重新輸入櫃台密碼");
+      }
+      if (!response.ok) {
+        throw new Error(data.message || "操作失敗");
+      }
       return data;
     }
 
-    tabs.forEach(tab => tab.addEventListener("click", () => {
-      const targetView = tab.dataset.view;
-      if (protectedViews.has(targetView) && !state.token) {
-        setAuthUi(false, "請先登入櫃台帳號");
-        switchView("displayView");
-        return;
-      }
-      switchView(targetView);
-    }));
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => switchView(tab.dataset.view));
+    });
 
     function renderPublic() {
       $("currentPickupDisplay").textContent = publicState.currentPickupNumber || "--";
-      $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 筆`;
+      $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 組`;
       const wrap = $("waitingList");
-      wrap.innerHTML = publicState.waitingPickupNumbers.length ? "" : '<div class="chip empty">目前沒有等待號碼</div>';
-      publicState.waitingPickupNumbers.forEach(number => {
+      wrap.innerHTML = "";
+      if (!publicState.waitingPickupNumbers.length) {
+        wrap.innerHTML = '<div class="empty">目前沒有等待中的號碼</div>';
+        return;
+      }
+
+      publicState.waitingPickupNumbers.forEach((number) => {
         const chip = document.createElement("div");
         chip.className = "chip";
         chip.textContent = number;
@@ -350,33 +375,47 @@
       const iceWrap = $("iceProducts");
       drinkWrap.innerHTML = "";
       iceWrap.innerHTML = "";
-      state.products.forEach(product => {
+
+      state.products.forEach((product) => {
         const qty = cart.get(product.id) || 0;
         const card = document.createElement("div");
         card.className = "item";
-        card.innerHTML = `<div><strong>${product.name}</strong><div class="muted">${money(product.price)}</div></div><div class="qty"><button data-op="minus">-</button><span>${qty}</span><button data-op="plus">+</button></div>`;
-        card.querySelectorAll("button").forEach(button => button.addEventListener("click", () => {
-          const next = (cart.get(product.id) || 0) + (button.dataset.op === "plus" ? 1 : -1);
-          if (next <= 0) cart.delete(product.id); else cart.set(product.id, next);
-          renderProducts();
-          renderSummary();
-        }));
+        card.innerHTML = `<div><strong>${product.name}</strong><div class="muted">${money(product.price)}</div></div><div class="qty"><button type="button" data-op="minus">-</button><span>${qty}</span><button type="button" data-op="plus">+</button></div>`;
+
+        card.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const next = (cart.get(product.id) || 0) + (button.dataset.op === "plus" ? 1 : -1);
+            if (next <= 0) {
+              cart.delete(product.id);
+            } else {
+              cart.set(product.id, next);
+            }
+            renderProducts();
+            renderSummary();
+          });
+        });
+
         (product.category === "drink" ? drinkWrap : iceWrap).appendChild(card);
       });
     }
 
     function renderSummary() {
       const wrap = $("orderSummary");
-      const items = state.products.filter(product => cart.has(product.id)).map(product => ({ ...product, quantity: cart.get(product.id) }));
+      const items = state.products
+        .filter((product) => cart.has(product.id))
+        .map((product) => ({ ...product, quantity: cart.get(product.id) }));
+
       $("summaryCount").textContent = `${items.length} 項`;
       wrap.innerHTML = "";
+
       if (!items.length) {
-        wrap.innerHTML = '<div class="empty">還沒有加入任何品項</div>';
+        wrap.innerHTML = '<div class="empty">尚未加入任何商品</div>';
         $("totalAmount").textContent = "$0";
         return;
       }
+
       let total = 0;
-      items.forEach(item => {
+      items.forEach((item) => {
         const subtotal = item.price * item.quantity;
         total += subtotal;
         const row = document.createElement("div");
@@ -384,32 +423,67 @@
         row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">${item.category === "drink" ? "飲料" : "冰品"}</div></div><div>x ${item.quantity}</div><div>${money(subtotal)}</div>`;
         wrap.appendChild(row);
       });
+
       $("totalAmount").textContent = money(total);
     }
 
     function statusText(status) {
-      return { pending: "待製作", preparing: "製作中", done: "完成", cancelled: "已取消" }[status] || status;
+      return {
+        pending: "待製作",
+        preparing: "製作中",
+        done: "已完成",
+        cancelled: "已取消"
+      }[status] || status;
     }
 
     function buildKitchenCard(order, category) {
-      const items = order.items.filter(item => item.category === category);
-      if (!items.length || order.status === "done" || order.status === "cancelled") return null;
+      const items = order.items.filter((item) => item.category === category);
+      if (!items.length || order.status === "done" || order.status === "cancelled") {
+        return null;
+      }
+
       const card = document.createElement("div");
       card.className = "orderCard";
-      card.innerHTML = `<div class="orderHead"><div><div class="orderId">${order.pickupNumber || order.orderId}</div><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></div></div><div class="tags"><span class="tag">${statusText(order.status)}</span><span class="tag">${money(order.totalAmount)}</span><span class="tag">${order.pickupNumber || "無叫號"}</span></div><div class="stack">${items.map(item => `<div class="item"><span>${item.name}</span><strong>x ${item.quantity}</strong></div>`).join("")}</div>${order.note ? `<div class="note">${order.note}</div>` : ""}`;
-      const actions = document.createElement("div");
-      actions.className = "btns";
-      actions.style.marginTop = "10px";
-      actions.innerHTML = '<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">完成</button>';
-      actions.querySelectorAll("button").forEach(button => button.addEventListener("click", async () => {
-        try {
-          await request(`/api/orders/${order.orderId}/status`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ status: button.dataset.status }) });
-          await loadAdminState();
-        } catch (error) {
-          alert(error.message);
-        }
-      }));
-      card.appendChild(actions);
+      card.innerHTML = `
+        <div class="orderHead">
+          <div>
+            <div class="orderId">${order.pickupNumber || order.orderId}</div>
+            <div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div>
+          </div>
+        </div>
+        <div class="tags">
+          <span class="tag">${statusText(order.status)}</span>
+          <span class="tag">${money(order.totalAmount)}</span>
+          <span class="tag">${order.pickupNumber ? "有叫號" : "無叫號"}</span>
+        </div>
+        <div class="stack">${items.map((item) => `<div class="item"><span>${item.name}</span><strong>x ${item.quantity}</strong></div>`).join("")}</div>
+        ${order.note ? `<div class="note">${order.note}</div>` : ""}
+      `;
+
+      if (state.token) {
+        const actions = document.createElement("div");
+        actions.className = "btns";
+        actions.style.marginTop = "10px";
+        actions.innerHTML = `<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">已完成</button>`;
+
+        actions.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", async () => {
+            try {
+              await request(`/api/orders/${order.orderId}/status`, {
+                method: "PATCH",
+                headers: authHeaders(),
+                body: JSON.stringify({ status: button.dataset.status })
+              });
+              await refresh();
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+        });
+
+        card.appendChild(actions);
+      }
+
       return card;
     }
 
@@ -420,59 +494,76 @@
       iceWrap.innerHTML = "";
       let drinkCount = 0;
       let iceCount = 0;
-      state.orders.filter(order => order.status !== "done" && order.status !== "cancelled").forEach(order => {
-        const drinkCard = buildKitchenCard(order, "drink");
-        const iceCard = buildKitchenCard(order, "ice");
-        if (drinkCard) {
-          drinkWrap.appendChild(drinkCard);
-          drinkCount += 1;
-        }
-        if (iceCard) {
-          iceWrap.appendChild(iceCard);
-          iceCount += 1;
-        }
-      });
-      if (!drinkCount) drinkWrap.innerHTML = '<div class="empty">目前沒有飲料訂單</div>';
-      if (!iceCount) iceWrap.innerHTML = '<div class="empty">目前沒有冰品訂單</div>';
-      $("drinkOrderCount").textContent = `${drinkCount} 張`;
-      $("iceOrderCount").textContent = `${iceCount} 張`;
+
+      state.orders
+        .filter((order) => order.status !== "done" && order.status !== "cancelled")
+        .forEach((order) => {
+          const drinkCard = buildKitchenCard(order, "drink");
+          const iceCard = buildKitchenCard(order, "ice");
+
+          if (drinkCard) {
+            drinkWrap.appendChild(drinkCard);
+            drinkCount += 1;
+          }
+          if (iceCard) {
+            iceWrap.appendChild(iceCard);
+            iceCount += 1;
+          }
+        });
+
+      if (!drinkCount) {
+        drinkWrap.innerHTML = '<div class="empty">目前沒有飲料訂單</div>';
+      }
+      if (!iceCount) {
+        iceWrap.innerHTML = '<div class="empty">目前沒有冰品訂單</div>';
+      }
+
+      $("drinkOrderCount").textContent = `${drinkCount} 單`;
+      $("iceOrderCount").textContent = `${iceCount} 單`;
     }
 
     function renderStats() {
       $("counterCurrentPickup").textContent = state.calling.currentPickupNumber || "--";
-      $("counterWaitingCount").textContent = state.calling.waitingPickupNumbers.length;
+      $("counterWaitingCount").textContent = String(state.calling.waitingPickupNumbers.length);
       $("quickRevenue").textContent = money(state.stats.totalRevenue);
-      $("quickOrders").textContent = state.stats.totalOrders;
+      $("quickOrders").textContent = String(state.stats.totalOrders);
       $("statRevenue").textContent = money(state.stats.totalRevenue);
-      $("statOrders").textContent = state.stats.totalOrders;
-      $("statPending").textContent = state.stats.pendingOrders;
-      $("statPreparing").textContent = state.stats.preparingOrders;
+      $("statOrders").textContent = String(state.stats.totalOrders);
+      $("statPending").textContent = String(state.stats.pendingOrders);
+      $("statPreparing").textContent = String(state.stats.preparingOrders);
     }
 
     function renderSales() {
       const rows = state.stats.productSales || [];
       $("salesTableWrap").innerHTML = rows.length
-        ? `<table><thead><tr><th>品項</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>`
-        : '<div class="empty">今天還沒有銷售資料</div>';
+        ? `<table><thead><tr><th>商品</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">今天還沒有銷售紀錄</div>';
     }
 
     function renderOrders() {
       $("ordersTableWrap").innerHTML = state.orders.length
-        ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map(order => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map(item => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" ? '<span class="muted">無</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>`
-        : '<div class="empty">還沒有訂單</div>';
-      document.querySelectorAll("[data-order-id]").forEach(button => button.addEventListener("click", async () => {
-        if (!confirm("確定要取消這張訂單嗎？")) return;
-        try {
-          await request(`/api/orders/${button.dataset.orderId}/cancel`, { method: "POST", headers: authHeaders() });
-          await loadAdminState();
-        } catch (error) {
-          alert(error.message);
-        }
-      }));
+        ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map((order) => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map((item) => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" || !state.token ? '<span class="muted">--</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">目前沒有訂單</div>';
+
+      document.querySelectorAll("[data-order-id]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          if (!confirm("確定要取消這筆訂單嗎？")) {
+            return;
+          }
+          try {
+            await request(`/api/orders/${button.dataset.orderId}/cancel`, {
+              method: "POST",
+              headers: authHeaders()
+            });
+            await refresh();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      });
     }
 
     function renderAdmin() {
-      if (!state.token) return;
       renderProducts();
       renderSummary();
       renderStats();
@@ -483,27 +574,39 @@
 
     async function loadPublicState() {
       const response = await fetch(api("/api/public-state"));
-      if (!response.ok) throw new Error("無法讀取叫號資料");
+      if (!response.ok) {
+        throw new Error("無法讀取叫號資訊");
+      }
       Object.assign(publicState, await response.json());
       renderPublic();
     }
 
     async function loadAdminState() {
-      if (!state.token) return;
-      const data = await request("/api/admin-state", { headers: { Authorization: `Bearer ${state.token}` } });
+      if (!state.token) {
+        state.products = [];
+        state.orders = [];
+        state.calling = { currentPickupNumber: publicState.currentPickupNumber, waitingPickupNumbers: publicState.waitingPickupNumbers, calledPickupNumbers: [] };
+        state.stats = { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] };
+        renderAdmin();
+        return;
+      }
+
+      const data = await request("/api/admin-state", {
+        headers: { Authorization: `Bearer ${state.token}` }
+      });
       state.products = data.products;
       state.orders = data.orders;
       state.calling = data.calling;
       state.stats = data.stats;
-      setAuthUi(true, "已登入櫃台");
+      setAuthUi(true, "登入成功，後台功能已開啟");
       renderAdmin();
     }
 
     async function refresh() {
       try {
         await loadPublicState();
-        if (state.token) await loadAdminState();
-        setConnection("系統已連線", true);
+        await loadAdminState();
+        setConnection("連線正常", true);
       } catch (error) {
         setConnection(error.message, false);
       }
@@ -524,11 +627,15 @@
       }
     });
 
-    $("logoutBtn").addEventListener("click", () => logout("已登出"));
+    $("logoutBtn").addEventListener("click", () => logout("已登出櫃台"));
 
     $("createOrderBtn").addEventListener("click", async () => {
       const items = [...cart.entries()].map(([productId, quantity]) => ({ productId, quantity }));
-      if (!items.length) return alert("請先加入品項");
+      if (!items.length) {
+        alert("請先加入商品");
+        return;
+      }
+
       try {
         await request("/api/orders", {
           method: "POST",
@@ -542,8 +649,6 @@
         cart.clear();
         $("orderNote").value = "";
         $("needsPickupToggle").checked = false;
-        renderProducts();
-        renderSummary();
         await refresh();
       } catch (error) {
         alert(error.message);
@@ -577,12 +682,11 @@
     });
 
     async function init() {
-      setAuthUi(false, "");
-      switchView("displayView");
+      setAuthUi(false, "請先登入櫃台密碼");
       renderSummary();
+      renderPublic();
       await refresh();
-      clearInterval(refreshTimer);
-      refreshTimer = setInterval(refresh, 5000);
+      setInterval(refresh, 5000);
     }
 
     init();

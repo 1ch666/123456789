@@ -26,6 +26,7 @@ const defaultState = {
   businessDate: currentBusinessDate(),
   sessions: []
 };
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
 
 function currentBusinessDate() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -89,6 +90,12 @@ function createSessionToken() {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+function createSession() {
+  const token = createSessionToken();
+  const expiresAt = Date.now() + TOKEN_TTL_MS;
+  return { token, expiresAt };
+}
+
 function unauthorized() {
   return {
     success: false,
@@ -106,7 +113,7 @@ function clone(value) {
 
 export default {
   async fetch(request, env) {
-    const origin = env.CORS_ORIGIN || "*";
+    const origin = env.CORS_ORIGIN || "https://1ch666.github.io/123456789";
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -152,6 +159,7 @@ export class CounterState {
     const url = new URL(request.url);
     const data = await this.loadData();
     const dayChanged = this.ensureCurrentBusinessDay(data);
+    this.pruneExpiredSessions(data);
     if (dayChanged) {
       await this.saveData(data);
     }
@@ -165,15 +173,23 @@ export class CounterState {
 
     if (request.method === "POST" && url.pathname === "/api/login") {
       const body = await readJson(request);
+      if (!this.env.ADMIN_PASSWORD) {
+        return json({ success: false, message: "伺服器尚未設定櫃台密碼" }, { status: 500 });
+      }
       if (body.password !== this.env.ADMIN_PASSWORD) {
         return json({ success: false, message: "櫃台密碼錯誤" }, { status: 401 });
       }
 
-      const token = createSessionToken();
-      data.sessions.push(token);
+      const session = createSession();
+      data.sessions.push(session);
       await this.saveData(data);
 
-      return json({ success: true, message: "登入成功", token });
+      return json({
+        success: true,
+        message: "登入成功",
+        token: session.token,
+        expiresAt: new Date(session.expiresAt).toISOString()
+      });
     }
 
     if (request.method === "GET" && url.pathname === "/api/admin-state") {
@@ -430,7 +446,8 @@ export class CounterState {
   isAuthorized(request, data) {
     const header = request.headers.get("Authorization") || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-    return Boolean(token) && data.sessions.includes(token);
+    this.pruneExpiredSessions(data);
+    return Boolean(token) && data.sessions.some((session) => session.token === token);
   }
 
   rebuildWaitingQueue(data) {
@@ -496,5 +513,10 @@ export class CounterState {
       sessions: data.sessions
     });
     return true;
+  }
+
+  pruneExpiredSessions(data) {
+    const now = Date.now();
+    data.sessions = (data.sessions || []).filter((session) => session && session.expiresAt > now);
   }
 }

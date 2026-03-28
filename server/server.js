@@ -8,7 +8,12 @@ const cors = require("cors");
 const app = express();
 const ROOT_DIR = path.resolve(__dirname, "..");
 const PORT = Number(process.env.PORT) || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "123";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
+
+if (!ADMIN_PASSWORD) {
+  throw new Error("Missing ADMIN_PASSWORD in environment");
+}
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +32,7 @@ const products = [
 ];
 
 const productMap = new Map(products.map((product) => [product.id, product]));
-const sessions = new Set();
+const sessions = new Map();
 
 const state = {
   orders: [],
@@ -58,6 +63,22 @@ function formatOrderId(sequence) {
 
 function createSessionToken() {
   return crypto.randomBytes(24).toString("hex");
+}
+
+function createSession() {
+  const token = createSessionToken();
+  const expiresAt = Date.now() + TOKEN_TTL_MS;
+  sessions.set(token, expiresAt);
+  return { token, expiresAt };
+}
+
+function pruneExpiredSessions() {
+  const now = Date.now();
+  for (const [token, expiresAt] of sessions.entries()) {
+    if (expiresAt <= now) {
+      sessions.delete(token);
+    }
+  }
 }
 
 function isActiveOrder(order) {
@@ -135,6 +156,7 @@ function ensureCurrentBusinessDay() {
 }
 
 function ensureAuth(req, res, next) {
+  pruneExpiredSessions();
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
 
@@ -168,14 +190,19 @@ app.get("/api/public-state", (req, res) => {
 
 app.post("/api/login", (req, res) => {
   ensureCurrentBusinessDay();
+  pruneExpiredSessions();
   const { password } = req.body || {};
   if (password !== ADMIN_PASSWORD) {
     return res.status(401).json({ success: false, message: "櫃台密碼錯誤" });
   }
 
-  const token = createSessionToken();
-  sessions.add(token);
-  res.json({ success: true, token, message: "登入成功" });
+  const session = createSession();
+  res.json({
+    success: true,
+    token: session.token,
+    expiresAt: new Date(session.expiresAt).toISOString(),
+    message: "登入成功"
+  });
 });
 
 app.get("/api/admin-state", ensureAuth, (req, res) => {

@@ -35,8 +35,18 @@ const state = {
   pickupSequence: 0,
   currentPickupNumber: null,
   waitingPickupNumbers: [],
-  calledPickupNumbers: []
+  calledPickupNumbers: [],
+  businessDate: currentBusinessDate()
 };
+
+function currentBusinessDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
 
 function formatPickupNumber(sequence) {
   return `A${String(sequence).padStart(3, "0")}`;
@@ -97,6 +107,7 @@ function sanitizeState() {
   return {
     products,
     orders: state.orders,
+    businessDate: state.businessDate,
     calling: {
       currentPickupNumber: state.currentPickupNumber,
       waitingPickupNumbers: state.waitingPickupNumbers,
@@ -107,12 +118,20 @@ function sanitizeState() {
 }
 
 function resetDailyState() {
+  state.businessDate = currentBusinessDate();
   state.orders = [];
   state.orderSequence = 0;
   state.pickupSequence = 0;
   state.currentPickupNumber = null;
   state.waitingPickupNumbers = [];
   state.calledPickupNumbers = [];
+}
+
+function ensureCurrentBusinessDay() {
+  const today = currentBusinessDate();
+  if (state.businessDate !== today) {
+    resetDailyState();
+  }
 }
 
 function ensureAuth(req, res, next) {
@@ -140,6 +159,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/public-state", (req, res) => {
+  ensureCurrentBusinessDay();
   res.json({
     currentPickupNumber: state.currentPickupNumber,
     waitingPickupNumbers: state.waitingPickupNumbers
@@ -147,6 +167,7 @@ app.get("/api/public-state", (req, res) => {
 });
 
 app.post("/api/login", (req, res) => {
+  ensureCurrentBusinessDay();
   const { password } = req.body || {};
   if (password !== ADMIN_PASSWORD) {
     return res.status(401).json({ success: false, message: "櫃台密碼錯誤" });
@@ -158,10 +179,12 @@ app.post("/api/login", (req, res) => {
 });
 
 app.get("/api/admin-state", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   res.json(sanitizeState());
 });
 
 app.post("/api/orders", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   const { items = [], note = "", needsPickupNumber = false } = req.body || {};
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ success: false, message: "請先選擇商品" });
@@ -217,6 +240,7 @@ app.post("/api/orders", ensureAuth, (req, res) => {
 });
 
 app.post("/api/call-next", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   if (state.waitingPickupNumbers.length === 0) {
     if (state.currentPickupNumber) {
       return res.json({
@@ -244,6 +268,7 @@ app.post("/api/call-next", ensureAuth, (req, res) => {
 });
 
 app.post("/api/recall-current", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   if (!state.currentPickupNumber) {
     return res.status(400).json({ success: false, message: "目前沒有可重叫的號碼" });
   }
@@ -261,6 +286,7 @@ app.post("/api/recall-current", ensureAuth, (req, res) => {
 });
 
 app.post("/api/clear-current-pickup", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   if (!state.currentPickupNumber) {
     return res.status(400).json({ success: false, message: "目前沒有號碼可清除" });
   }
@@ -276,6 +302,7 @@ app.post("/api/clear-current-pickup", ensureAuth, (req, res) => {
 });
 
 app.post("/api/reset-calling", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   state.currentPickupNumber = null;
   state.calledPickupNumbers = [];
   rebuildWaitingQueue();
@@ -294,6 +321,7 @@ app.post("/api/reset-daily", ensureAuth, (req, res) => {
 });
 
 app.patch("/api/orders/:orderId/status", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   const order = getOrderOr404(req.params.orderId, res);
   if (!order) return;
 
@@ -313,6 +341,7 @@ app.patch("/api/orders/:orderId/status", ensureAuth, (req, res) => {
 });
 
 app.post("/api/orders/:orderId/cancel", ensureAuth, (req, res) => {
+  ensureCurrentBusinessDay();
   const order = getOrderOr404(req.params.orderId, res);
   if (!order) return;
 

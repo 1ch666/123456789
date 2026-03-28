@@ -23,8 +23,18 @@ const defaultState = {
   currentPickupNumber: null,
   waitingPickupNumbers: [],
   calledPickupNumbers: [],
+  businessDate: currentBusinessDate(),
   sessions: []
 };
+
+function currentBusinessDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
 
 function freshRuntimeState() {
   return {
@@ -33,7 +43,8 @@ function freshRuntimeState() {
     pickupSequence: 0,
     currentPickupNumber: null,
     waitingPickupNumbers: [],
-    calledPickupNumbers: []
+    calledPickupNumbers: [],
+    businessDate: currentBusinessDate()
   };
 }
 
@@ -140,6 +151,10 @@ export class CounterState {
   async fetch(request) {
     const url = new URL(request.url);
     const data = await this.loadData();
+    const dayChanged = this.ensureCurrentBusinessDay(data);
+    if (dayChanged) {
+      await this.saveData(data);
+    }
 
     if (request.method === "GET" && url.pathname === "/api/public-state") {
       return json({
@@ -431,6 +446,7 @@ export class CounterState {
     return {
       products,
       orders: data.orders,
+      businessDate: data.businessDate,
       calling: {
         currentPickupNumber: data.currentPickupNumber,
         waitingPickupNumbers: data.waitingPickupNumbers,
@@ -468,5 +484,17 @@ export class CounterState {
       doneOrders: data.orders.filter((order) => order.status === "done").length,
       productSales: [...productSales.values()].sort((a, b) => b.quantity - a.quantity)
     };
+  }
+
+  ensureCurrentBusinessDay(data) {
+    const today = currentBusinessDate();
+    if (data.businessDate === today) {
+      return false;
+    }
+
+    Object.assign(data, freshRuntimeState(), {
+      sessions: data.sessions
+    });
+    return true;
   }
 }

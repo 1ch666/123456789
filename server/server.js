@@ -209,15 +209,61 @@ app.post("/api/orders", ensureAuth, (req, res) => {
 
 app.post("/api/call-next", ensureAuth, (req, res) => {
   if (state.waitingPickupNumbers.length === 0) {
-    state.currentPickupNumber = null;
-    return res.json({ success: true, message: "目前沒有等待叫號", calling: sanitizeState().calling });
+    if (state.currentPickupNumber) {
+      return res.json({
+        success: true,
+        message: `目前沒有下一號，維持 ${state.currentPickupNumber}`,
+        calling: sanitizeState().calling
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "目前沒有等待叫號",
+      calling: sanitizeState().calling
+    });
   }
 
   const nextPickupNumber = state.waitingPickupNumbers.shift();
   state.currentPickupNumber = nextPickupNumber;
-  state.calledPickupNumbers.unshift(nextPickupNumber);
+  state.calledPickupNumbers = [
+    nextPickupNumber,
+    ...state.calledPickupNumbers.filter((number) => number !== nextPickupNumber)
+  ].slice(0, 10);
 
   res.json({ success: true, message: `已叫號 ${nextPickupNumber}`, calling: sanitizeState().calling });
+});
+
+app.post("/api/recall-current", ensureAuth, (req, res) => {
+  if (!state.currentPickupNumber) {
+    return res.status(400).json({ success: false, message: "目前沒有可重叫的號碼" });
+  }
+
+  state.calledPickupNumbers = [
+    state.currentPickupNumber,
+    ...state.calledPickupNumbers.filter((number) => number !== state.currentPickupNumber)
+  ].slice(0, 10);
+
+  res.json({
+    success: true,
+    message: `重新叫號 ${state.currentPickupNumber}`,
+    calling: sanitizeState().calling
+  });
+});
+
+app.post("/api/clear-current-pickup", ensureAuth, (req, res) => {
+  if (!state.currentPickupNumber) {
+    return res.status(400).json({ success: false, message: "目前沒有號碼可清除" });
+  }
+
+  const clearedPickupNumber = state.currentPickupNumber;
+  state.currentPickupNumber = null;
+
+  res.json({
+    success: true,
+    message: `已清除目前叫號 ${clearedPickupNumber}`,
+    calling: sanitizeState().calling
+  });
 });
 
 app.post("/api/reset-calling", ensureAuth, (req, res) => {

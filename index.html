@@ -198,7 +198,20 @@
             </div>
             <div class="btns" style="margin-top:14px">
               <button class="btn primary" id="callNextBtn">叫下一號</button>
+              <button class="btn secondary" id="recallCurrentBtn">重叫目前號碼</button>
+              <button class="btn ice" id="clearCurrentBtn">清除目前號碼</button>
               <button class="btn danger" id="resetCallingBtn">重設叫號</button>
+            </div>
+            <div class="notice" style="margin-top:14px">
+              <strong>叫號狀態</strong>
+              <div id="callingMessage" class="muted" style="margin-top:8px">尚未操作叫號。</div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="section">
+                <h3>最近叫號</h3>
+                <span class="muted">保留最近 10 筆</span>
+              </div>
+              <div class="chips" id="calledHistory"></div>
             </div>
           </div>
           <div class="card">
@@ -370,6 +383,24 @@
       });
     }
 
+    function renderCalledHistory() {
+      const wrap = $("calledHistory");
+      const history = state.calling.calledPickupNumbers || [];
+      wrap.innerHTML = "";
+
+      if (!history.length) {
+        wrap.innerHTML = '<div class="empty">目前還沒有叫號紀錄</div>';
+        return;
+      }
+
+      history.forEach((number) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = number;
+        wrap.appendChild(chip);
+      });
+    }
+
     function renderProducts() {
       const drinkWrap = $("drinkProducts");
       const iceWrap = $("iceProducts");
@@ -531,6 +562,7 @@
       $("statOrders").textContent = String(state.stats.totalOrders);
       $("statPending").textContent = String(state.stats.pendingOrders);
       $("statPreparing").textContent = String(state.stats.preparingOrders);
+      renderCalledHistory();
     }
 
     function renderSales() {
@@ -602,6 +634,10 @@
       renderAdmin();
     }
 
+    function setCallingMessage(message) {
+      $("callingMessage").textContent = message;
+    }
+
     async function refresh() {
       try {
         await loadPublicState();
@@ -665,7 +701,28 @@
 
     $("callNextBtn").addEventListener("click", async () => {
       try {
-        await request("/api/call-next", { method: "POST", headers: authHeaders() });
+        const response = await request("/api/call-next", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("recallCurrentBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/recall-current", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("clearCurrentBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/clear-current-pickup", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
         await refresh();
       } catch (error) {
         alert(error.message);
@@ -674,7 +731,8 @@
 
     $("resetCallingBtn").addEventListener("click", async () => {
       try {
-        await request("/api/reset-calling", { method: "POST", headers: authHeaders() });
+        const response = await request("/api/reset-calling", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
         await refresh();
       } catch (error) {
         alert(error.message);
@@ -683,6 +741,7 @@
 
     async function init() {
       setAuthUi(false, "請先登入櫃台密碼");
+      setCallingMessage("尚未操作叫號。");
       renderSummary();
       renderPublic();
       await refresh();

@@ -70,6 +70,11 @@
     .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
     .metric strong{display:block;font-size:30px;margin-top:8px}
     .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
+    .dangerPanel{padding:18px;border:1px solid rgba(180,35,24,.22);border-radius:20px;background:linear-gradient(180deg,rgba(180,35,24,.08),rgba(180,35,24,.02))}
+    .dangerPanel strong{color:var(--danger)}
+    .dangerButton{background:linear-gradient(180deg,#cf3b2d,#a61f15);color:#fff;box-shadow:0 10px 22px rgba(180,35,24,.22)}
+    .dangerButton:hover{filter:brightness(1.03)}
+    .actionText{font-size:14px;color:var(--muted)}
     .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
     .orderHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
     .orderId{font-size:24px;font-weight:900}
@@ -262,6 +267,16 @@
         </div>
         <div id="manageGate" class="notice">登入後可查看管理資料。</div>
         <div id="manageContent" style="display:none">
+          <div class="dangerPanel" style="margin-bottom:16px">
+            <div class="section">
+              <h3>管理操作</h3>
+              <span class="muted">重設會清空今日訂單、營收與叫號資料</span>
+            </div>
+            <div class="btns">
+              <button class="btn dangerButton" id="resetDailyBtn">重設今日資料</button>
+            </div>
+            <div class="actionText" id="manageActionMessage" style="margin-top:12px">尚未執行管理操作。</div>
+          </div>
           <div class="grid-four">
             <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
             <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
@@ -640,6 +655,10 @@
       $("callingMessage").textContent = message;
     }
 
+    function setManageActionMessage(message) {
+      $("manageActionMessage").textContent = message;
+    }
+
     async function refresh() {
       try {
         await loadPublicState();
@@ -741,9 +760,28 @@
       }
     });
 
+    $("resetDailyBtn").addEventListener("click", async () => {
+      if (!confirm("確定要重設今日資料嗎？這會清空訂單、營收與叫號紀錄。")) {
+        return;
+      }
+
+      try {
+        const response = await request("/api/reset-daily", { method: "POST", headers: authHeaders() });
+        cart.clear();
+        $("orderNote").value = "";
+        $("needsPickupToggle").checked = false;
+        setCallingMessage("今日資料已重設。");
+        setManageActionMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
     async function init() {
       setAuthUi(false, "請先登入櫃台密碼");
       setCallingMessage("尚未操作叫號。");
+      setManageActionMessage("尚未執行管理操作。");
       renderSummary();
       renderPublic();
       await refresh();

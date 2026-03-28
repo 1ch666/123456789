@@ -26,6 +26,17 @@ const defaultState = {
   sessions: []
 };
 
+function freshRuntimeState() {
+  return {
+    orders: [],
+    orderSequence: 0,
+    pickupSequence: 0,
+    currentPickupNumber: null,
+    waitingPickupNumbers: [],
+    calledPickupNumbers: []
+  };
+}
+
 function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
   for (const [key, value] of Object.entries(jsonHeaders)) {
@@ -310,6 +321,21 @@ export class CounterState {
         success: true,
         message: "叫號狀態已重設",
         calling: this.sanitizeState(data).calling
+      });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/reset-daily") {
+      if (!this.isAuthorized(request, data)) {
+        return json(unauthorized(), { status: 401 });
+      }
+
+      Object.assign(data, freshRuntimeState());
+      await this.saveData(data);
+
+      return json({
+        success: true,
+        message: "今日資料已重設",
+        state: this.sanitizeState(data)
       });
     }
 

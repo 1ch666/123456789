@@ -106,6 +106,15 @@ function sanitizeState() {
   };
 }
 
+function resetDailyState() {
+  state.orders = [];
+  state.orderSequence = 0;
+  state.pickupSequence = 0;
+  state.currentPickupNumber = null;
+  state.waitingPickupNumbers = [];
+  state.calledPickupNumbers = [];
+}
+
 function ensureAuth(req, res, next) {
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
@@ -272,6 +281,16 @@ app.post("/api/reset-calling", ensureAuth, (req, res) => {
   rebuildWaitingQueue();
 
   res.json({ success: true, message: "叫號狀態已重設", calling: sanitizeState().calling });
+});
+
+app.post("/api/reset-daily", ensureAuth, (req, res) => {
+  resetDailyState();
+
+  res.json({
+    success: true,
+    message: "今日資料已重設",
+    state: sanitizeState()
+  });
 });
 
 app.patch("/api/orders/:orderId/status", ensureAuth, (req, res) => {

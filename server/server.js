@@ -102,11 +102,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(ROOT_DIR, "index.html"));
 });
 
-app.get("/api/health", (req, res) => {
-  const state = readState();
-  res.json({ success: true, service: "garbage-news-api", stats: buildStats(state.posts || []) });
-});
-
 app.get("/api/posts", (req, res) => {
   res.json({ success: true, ...serializeState(readState()) });
 });
@@ -127,7 +122,6 @@ app.post("/api/posts", (req, res) => {
   const state = readState();
   const parsed = validatePostInput(req.body || {});
   if (parsed.error) return res.status(400).json({ success: false, message: parsed.error });
-
   state.postSequence = Number(state.postSequence || 0) + 1;
   const now = new Date().toISOString();
   const post = {
@@ -150,14 +144,9 @@ app.patch("/api/posts/:postId", (req, res) => {
   const state = readState();
   const post = (state.posts || []).find((item) => item.id === req.params.postId);
   if (!post) return res.status(404).json({ success: false, message: "找不到文章" });
-
   const parsed = validatePostInput(req.body || {});
   if (parsed.error) return res.status(400).json({ success: false, message: parsed.error });
-
-  Object.assign(post, parsed.value, {
-    slug: createSlug(parsed.value.title),
-    updatedAt: new Date().toISOString()
-  });
+  Object.assign(post, parsed.value, { slug: createSlug(parsed.value.title), updatedAt: new Date().toISOString() });
   writeState(state);
   res.json({ success: true, message: "文章已更新", post, ...serializeState(state) });
 });
@@ -166,12 +155,10 @@ app.post("/api/posts/:postId/reactions", (req, res) => {
   const state = readState();
   const post = (state.posts || []).find((item) => item.id === req.params.postId);
   if (!post) return res.status(404).json({ success: false, message: "找不到文章" });
-
   const type = String(req.body?.type || "");
   if (!["fire", "trash"].includes(type)) {
     return res.status(400).json({ success: false, message: "不支援的互動類型" });
   }
-
   post.reactions[type] += 1;
   writeState(state);
   res.json({ success: true, message: "互動已送出", post, stats: buildStats(state.posts || []) });
@@ -182,7 +169,6 @@ app.patch("/api/posts/:postId/feature", (req, res) => {
   const state = readState();
   const post = (state.posts || []).find((item) => item.id === req.params.postId);
   if (!post) return res.status(404).json({ success: false, message: "找不到文章" });
-
   for (const item of state.posts) item.featured = false;
   post.featured = true;
   post.updatedAt = new Date().toISOString();

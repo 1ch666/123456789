@@ -4,67 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>超級垃圾新聞網</title>
-  <meta name="description" content="一個荒謬、即時、可匿名發文的垃圾新聞站，前端可部署在 GitHub Pages，後端可接免費 Cloudflare Worker API。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@40&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
-    :root{--bg:#f2eadf;--paper:#f7f2ea;--ink:#171411;--muted:#665b50;--line:rgba(23,20,17,.12);--accent:#cb4b16;--accent-dark:#8e2703;--gold:#d1a13d;--card:#fffdfa;--shadow:0 20px 50px rgba(36,25,15,.08);--radius:28px}
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
-    body{margin:0;color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:radial-gradient(circle at top left,rgba(203,75,22,.14),transparent 28%),radial-gradient(circle at 85% 10%,rgba(209,161,61,.16),transparent 20%),linear-gradient(180deg,#efe4d4 0%,#f8f3eb 42%,#f0e6d8 100%)}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(23,20,17,.04) 1px,transparent 1px);background-size:100% 7px;mix-blend-mode:multiply}
-    .shell{max-width:1320px;margin:0 auto;padding:28px 20px 56px;position:relative}
-    .masthead,.hero-grid,.layout{display:grid;gap:18px}.masthead{grid-template-columns:1.2fr .8fr}.hero-grid,.layout{grid-template-columns:1.15fr .85fr;align-items:start}
-    .brand,.card{border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}.brand{background:linear-gradient(135deg,rgba(255,252,246,.96),rgba(245,235,221,.95));border-radius:36px;position:relative}.card{background:rgba(255,253,250,.9);border-radius:var(--radius);backdrop-filter:blur(8px)}
-    .brand:after{content:"垃圾速報";position:absolute;top:18px;right:-38px;transform:rotate(18deg);background:var(--accent);color:#fff6ef;padding:10px 42px;font-weight:900;letter-spacing:.2em;box-shadow:0 12px 24px rgba(142,39,3,.2)}
-    .brand-inner,.headline,.status-panel,.story,.composer{padding:24px}.brand-inner{padding:34px}
-    .eyebrow,.panel-label{text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--accent-dark);font-weight:900}
-    h1,h2,h3{margin:0;font-family:"DM Serif Display","Noto Serif TC",serif;font-weight:400;line-height:1} h1{font-size:clamp(48px,8vw,96px);margin-top:10px;max-width:10ch}
-    .brand p{margin:18px 0 0;max-width:56ch;color:var(--muted);line-height:1.75;font-size:16px}
-    .headline{display:grid;gap:18px;min-height:520px}.headline-title{font-size:clamp(34px,5.2vw,66px);line-height:1.02;max-width:12ch}
-    .badge,.pill,.reaction-btn,.tag-filter{display:inline-flex;align-items:center}.badge{gap:8px;width:max-content;padding:8px 14px;border-radius:999px;background:rgba(203,75,22,.1);color:var(--accent-dark);font-size:13px;font-weight:800}
-    .headline-summary{font-size:18px;line-height:1.75;color:var(--muted);max-width:44ch}.headline-content{font-size:15px;line-height:1.9;color:#332a24;padding-top:18px;border-top:1px solid var(--line)}
-    .headline-footer,.toolbar,.toolbar-left,.toolbar-right,.status-row,.reaction-group,.story-actions{display:flex;flex-wrap:wrap;gap:10px}
-    .headline-footer{gap:10px 16px;align-items:center;color:var(--muted);font-size:14px}
-    .pill{gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:700}
-    .status-panel{display:grid;gap:18px;background:linear-gradient(180deg,rgba(255,249,240,.96),rgba(248,239,226,.94)),repeating-linear-gradient(135deg,transparent 0 14px,rgba(23,20,17,.015) 14px 28px)}
-    .status-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{padding:18px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.8)}.metric strong{display:block;font-size:36px;margin-top:8px;line-height:1}
-    .meta,.feed,.composer,.compose-grid,.field{display:grid;gap:12px}.toolbar{margin:22px 0;justify-content:space-between;align-items:center;padding:0 4px}
-    .tag-filter{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:10px 14px;cursor:pointer;font:inherit;font-weight:800;transition:.2s ease}.tag-filter.active,.tag-filter:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-    .story{gap:16px}.story-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.story h3{font-size:32px;line-height:1.08;margin-top:8px}.story p{margin:0;line-height:1.8;color:#3f352e}.story-summary{font-size:16px;color:var(--muted)}
-    .story-actions{align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line)}
-    .reaction-btn,.ghost-btn,.primary-btn{border:0;cursor:pointer;font:inherit;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
-    .reaction-btn{padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800}.reaction-btn:hover,.ghost-btn:hover,.primary-btn:hover{transform:translateY(-1px)}
-    .primary-btn{padding:13px 18px;border-radius:18px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 14px 26px rgba(142,39,3,.2);font-weight:900}
-    .ghost-btn{padding:12px 16px;border-radius:18px;background:#fff;border:1px solid var(--line);font-weight:800}
-    .composer{position:sticky;top:20px}.field label{font-size:13px;font-weight:900;letter-spacing:.08em;color:var(--accent-dark)}
-    input,textarea,select{width:100%;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);font:inherit;padding:14px 16px} textarea{min-height:140px;resize:vertical}
-    .help{font-size:13px;line-height:1.7;color:var(--muted);padding:14px 16px;border-radius:18px;border:1px dashed var(--line);background:rgba(255,249,240,.88)}
-    .flash{min-height:24px;color:var(--accent-dark);font-size:14px;font-weight:700}.empty{padding:30px 24px;text-align:center;color:var(--muted)}.footer{margin-top:28px;text-align:center;color:var(--muted);font-size:14px}.loading{animation:glow 1.1s ease-in-out infinite alternate}
-    @keyframes glow{from{opacity:.58}to{opacity:1}}
-    @media (max-width:1080px){.masthead,.hero-grid,.layout{grid-template-columns:1fr}.composer{position:static}.headline{min-height:auto}}
-    @media (max-width:720px){.shell{padding:16px 14px 40px}.brand-inner,.headline,.status-panel,.story,.composer{padding:20px}.status-row{grid-template-columns:1fr}.story h3{font-size:26px}.headline-title{max-width:none}}
+    :root{--bg:#efe4d6;--paper:#fffaf4;--ink:#181511;--muted:#6d6258;--line:rgba(24,21,17,.12);--accent:#bf4514;--accent-dark:#892803;--shadow:0 18px 42px rgba(37,24,13,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink);background:radial-gradient(circle at 0 0,rgba(191,69,20,.14),transparent 24%),linear-gradient(180deg,#efe4d6 0%,#f8f2ea 45%,#efe5d7 100%)}
+    .shell{max-width:1320px;margin:0 auto;padding:24px 18px 52px}.masthead,.hero-grid,.layout{display:grid;gap:18px}.masthead,.hero-grid,.layout{grid-template-columns:1fr 1fr}
+    .brand,.card{background:rgba(255,250,244,.94);border:1px solid var(--line);border-radius:32px;box-shadow:var(--shadow)} .brand{padding:32px;position:relative;overflow:hidden}
+    .brand:after{content:"垃圾速報";position:absolute;top:20px;right:-36px;transform:rotate(20deg);padding:10px 40px;background:var(--accent);color:#fff;font-weight:900;letter-spacing:.18em}
+    .eyebrow,.panel-label{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent-dark);font-weight:900}
+    h1,h2,h3{margin:0;font-family:"DM Serif Display","Noto Serif TC",serif;font-weight:400;line-height:1} h1{font-size:clamp(46px,8vw,92px);margin-top:8px}
+    .card{padding:22px}.headline{display:grid;gap:16px;min-height:420px}.headline-title{font-size:clamp(32px,5vw,64px);line-height:1.02}.headline-summary{margin:0;color:var(--muted);line-height:1.8;font-size:18px}
+    .headline-content{line-height:1.9;border-top:1px solid var(--line);padding-top:16px;color:#352d27}.headline-footer,.story-actions,.toolbar,.btn-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .headline-footer{color:var(--muted);font-size:14px}.badge,.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px}.badge{background:rgba(191,69,20,.1);color:var(--accent-dark);font-size:13px;font-weight:900}.pill{border:1px solid var(--line);background:#fff}
+    .toolbar{margin:22px 0}.toolbar-left{display:flex;flex-wrap:wrap;gap:10px}.tag-filter,.btn,.reaction-btn{font:inherit;cursor:pointer;transition:.18s ease}.tag-filter{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:800}
+    .tag-filter.active,.tag-filter:hover{background:var(--ink);color:#fff;border-color:var(--ink)}.feed{display:grid;gap:16px}.story{display:grid;gap:14px}.story h3{font-size:30px;line-height:1.08}.story p{margin:0;line-height:1.85}.story-summary{color:var(--muted)}
+    .story-actions{justify-content:space-between;border-top:1px solid var(--line);padding-top:14px}.reaction-group{display:flex;flex-wrap:wrap;gap:10px}.reaction-btn,.btn{padding:11px 15px;border-radius:16px;border:1px solid var(--line);background:#fff}.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;border:0;font-weight:900}
+    .panel-stack,.composer,.admin-panel,.field,.list{display:grid;gap:14px}.composer,.admin-panel{position:sticky;top:20px}.field label{font-size:13px;color:var(--accent-dark);font-weight:900;letter-spacing:.08em}
+    input,textarea{width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit} textarea{min-height:120px;resize:vertical}
+    .help,.flash,.admin-status{padding:12px 14px;border-radius:18px;font-size:14px;line-height:1.7}.help{border:1px dashed var(--line);background:rgba(255,248,238,.9);color:var(--muted)}.flash,.admin-status{background:#fff;border:1px solid var(--line)}
+    .empty{text-align:center;padding:28px 22px;color:var(--muted)} .hidden{display:none !important} .admin-item{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff}.footer{margin-top:26px;text-align:center;color:var(--muted);font-size:14px}
+    @media (max-width:1080px){.masthead,.hero-grid,.layout{grid-template-columns:1fr}.composer,.admin-panel{position:static}}
   </style>
 </head>
 <body>
   <main class="shell">
     <section class="masthead">
-      <div class="brand">
-        <div class="brand-inner">
-          <div class="eyebrow">Independent nonsense press</div>
-          <h1>超級垃圾新聞網</h1>
-        </div>
-      </div>
-      <aside class="card status-panel">
-        <div><div class="panel-label">Newsroom</div><h2 style="margin-top:10px;font-size:38px">最新文章</h2></div>
-        <div class="help">登入管理員後可編輯文章與設定頭條。</div>
-      </aside>
+      <section class="brand">
+        <div class="eyebrow">Independent nonsense press</div>
+        <h1>超級垃圾新聞網</h1>
+      </section>
+      <section class="card">
+        <div class="panel-label">Admin</div>
+        <h2 style="margin-top:10px;font-size:38px">管理員介面</h2>
+        <div class="help">登入後可編輯文章、設為頭條、清空文章。</div>
+      </section>
     </section>
 
     <section class="hero-grid">
       <article class="card headline">
-        <div><div class="badge">頭條垃圾</div><h2 class="headline-title loading" id="featuredTitle">頭條載入中...</h2><p class="headline-summary" id="featuredSummary">正在從垃圾宇宙抓取最新資訊。</p></div>
-        <div class="headline-content" id="featuredContent">請稍候。</div>
+        <div>
+          <div class="badge">頭條新聞</div>
+          <h2 class="headline-title" id="featuredTitle">目前沒有頭條</h2>
+          <p class="headline-summary" id="featuredSummary">請先發表第一篇新聞。</p>
+        </div>
+        <div class="headline-content" id="featuredContent"></div>
         <div class="headline-footer">
           <span class="pill" id="featuredCategory">分類 --</span>
           <span id="featuredAuthor">作者 --</span>
@@ -72,51 +57,63 @@
         </div>
       </article>
 
-      <section class="card composer">
-        <div><div class="panel-label">Publish</div><h2 style="margin-top:10px;font-size:40px">發一篇垃圾新聞</h2></div>
-        <div class="help">不用登入。標題與內文送出後會直接寫入後端資料庫。若 API 尚未設定，頁面會進入展示模式，只能讀取預設文章。</div>
-        <form id="postForm" class="compose-grid">
-          <div class="field"><label for="titleInput">標題</label><input id="titleInput" name="title" maxlength="80" placeholder="例如：公司印表機宣布參選里長" required /></div>
-          <div class="field"><label for="authorInput">作者</label><input id="authorInput" name="author" maxlength="24" placeholder="匿名垃圾人" /></div>
-          <div class="field"><label for="categoryInput">分類</label><input id="categoryInput" name="category" maxlength="20" placeholder="自行輸入分類" /></div>
-          <div class="field"><label for="summaryInput">摘要</label><input id="summaryInput" name="summary" maxlength="140" placeholder="一句話先把荒謬感打出去" /></div>
-          <div class="field"><label for="contentInput">內文</label><textarea id="contentInput" name="content" maxlength="4000" placeholder="把這篇垃圾新聞寫完整。" required></textarea></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="primary-btn" type="submit" id="submitBtn">送出新聞</button><button class="ghost-btn" type="button" id="refreshBtn">重新整理文章</button></div>
-          <div class="flash" id="flashMessage"></div>
-        </form>
+      <section class="panel-stack">
+        <section class="card composer">
+          <div><div class="panel-label">Publish</div><h2 style="margin-top:10px;font-size:38px">發表文章</h2></div>
+          <form id="postForm" class="list">
+            <div class="field"><label for="titleInput">標題</label><input id="titleInput" name="title" maxlength="80" required /></div>
+            <div class="field"><label for="authorInput">作者</label><input id="authorInput" name="author" maxlength="24" placeholder="匿名垃圾人" /></div>
+            <div class="field"><label for="categoryInput">分類</label><input id="categoryInput" name="category" maxlength="20" /></div>
+            <div class="field"><label for="summaryInput">摘要</label><input id="summaryInput" name="summary" maxlength="140" /></div>
+            <div class="field"><label for="contentInput">內文</label><textarea id="contentInput" name="content" maxlength="4000" required></textarea></div>
+            <div class="btn-row"><button class="btn primary" type="submit" id="submitBtn">送出</button><button class="btn" type="button" id="refreshBtn">重新整理</button></div>
+            <div class="flash" id="flashMessage"></div>
+          </form>
+        </section>
+
+        <section class="card admin-panel">
+          <div class="field"><label for="adminPasswordInput">管理員密碼</label><input id="adminPasswordInput" type="password" placeholder="輸入密碼" /></div>
+          <div class="btn-row"><button class="btn primary" type="button" id="adminLoginBtn">登入</button><button class="btn hidden" type="button" id="adminLogoutBtn">登出</button></div>
+          <div class="admin-status" id="adminStatus">尚未登入</div>
+          <div id="adminControls" class="hidden">
+            <div class="btn-row" style="margin-bottom:10px"><button class="btn" type="button" id="clearPostsBtn">清空文章</button></div>
+            <div class="list" id="adminPostList"></div>
+          </div>
+        </section>
       </section>
     </section>
 
-    <section class="toolbar">
-      <div class="toolbar-left" id="categoryFilters"></div>
-    </section>
-
-    <section class="layout">
-      <section class="feed" id="postFeed"></section>
-    </section>
-
-    <div class="footer">© 2026 LightNews Trash Edition. Built for absurd publishing.</div>
+    <section class="toolbar"><div class="toolbar-left" id="categoryFilters"></div></section>
+    <section class="layout"><section class="feed" id="postFeed"></section></section>
+    <div class="footer">© 2026 LightNews Trash Edition.</div>
   </main>
 
   <script>
     const DEMO_STATE={posts:[],featuredPost:null,stats:{totalPosts:0,totalFire:0,totalTrash:0,categories:[]}};
-    const state={apiUrl:"",sourceMode:"demo",posts:[],filteredCategory:"全部",featuredPost:null,stats:DEMO_STATE.stats};
-    const els={featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn")};
+    const state={apiUrl:"",sourceMode:"demo",posts:[],filteredCategory:"全部",featuredPost:null,stats:DEMO_STATE.stats,adminPassword:localStorage.getItem("garbage-news-admin-password")||"",adminLoggedIn:false};
+    const els={featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn"),adminPasswordInput:document.getElementById("adminPasswordInput"),adminLoginBtn:document.getElementById("adminLoginBtn"),adminLogoutBtn:document.getElementById("adminLogoutBtn"),adminStatus:document.getElementById("adminStatus"),adminControls:document.getElementById("adminControls"),adminPostList:document.getElementById("adminPostList"),clearPostsBtn:document.getElementById("clearPostsBtn")};
     function resolveApiUrl(){const params=new URLSearchParams(window.location.search);const queryApi=params.get("api");if(queryApi){localStorage.setItem("garbage-news-api",queryApi);return queryApi.replace(/\/$/,"");}const savedApi=localStorage.getItem("garbage-news-api");return savedApi?savedApi.replace(/\/$/,""):"";}
     function setFlash(message,isError=false){els.flashMessage.textContent=message;els.flashMessage.style.color=isError?"#8e2703":"#285943";}
+    function setAdminStatus(message,isError=false){els.adminStatus.textContent=message;els.adminStatus.style.color=isError?"#8e2703":"#285943";}
     function formatDate(value){return new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(value));}
-    async function apiFetch(path,options={}){if(!state.apiUrl) throw new Error("尚未設定 API");const response=await fetch(`${state.apiUrl}${path}`,{headers:{"Content-Type":"application/json",...(options.headers||{})},...options});const data=await response.json().catch(()=>({}));if(!response.ok) throw new Error(data.message||"API 請求失敗");return data;}
+    async function apiFetch(path,options={}){if(!state.apiUrl) throw new Error("尚未設定 API");const headers={"Content-Type":"application/json",...(options.headers||{})};if(state.adminPassword) headers["X-Admin-Password"]=state.adminPassword;const response=await fetch(`${state.apiUrl}${path}`,{...options,headers});const data=await response.json().catch(()=>({}));if(!response.ok) throw new Error(data.message||"API 請求失敗");return data;}
     function applyData(payload,mode){state.sourceMode=mode;state.posts=payload.posts||[];state.featuredPost=payload.featuredPost||state.posts[0]||null;state.stats=payload.stats||{totalPosts:0,totalFire:0,totalTrash:0,categories:[]};render();}
     async function loadPosts(){try{if(!state.apiUrl){applyData(DEMO_STATE,"demo");return;}const payload=await apiFetch("/api/posts");applyData(payload,"live");}catch(error){applyData(DEMO_STATE,"demo");setFlash(`API 無法連線，已切換展示模式：${error.message}`,true);}}
-    function renderHeadline(){const post=state.featuredPost;if(!post){els.featuredTitle.textContent="目前沒有頭條";els.featuredSummary.textContent="請先發表第一篇垃圾新聞。";els.featuredContent.textContent="";return;}els.featuredTitle.classList.remove("loading");els.featuredTitle.textContent=post.title;els.featuredSummary.textContent=post.summary||post.content.slice(0,100);els.featuredContent.textContent=post.content;els.featuredCategory.textContent=`分類 ${post.category}`;els.featuredAuthor.textContent=`作者 ${post.author||"匿名垃圾人"}`;els.featuredDate.textContent=formatDate(post.createdAt);}
-    function renderStats(){}
+    function renderHeadline(){const post=state.featuredPost;if(!post){els.featuredTitle.textContent="目前沒有頭條";els.featuredSummary.textContent="請先發表第一篇新聞。";els.featuredContent.textContent="";els.featuredCategory.textContent="分類 --";els.featuredAuthor.textContent="作者 --";els.featuredDate.textContent="時間 --";return;}els.featuredTitle.textContent=post.title;els.featuredSummary.textContent=post.summary||post.content.slice(0,100);els.featuredContent.textContent=post.content;els.featuredCategory.textContent=`分類 ${post.category||"未分類"}`;els.featuredAuthor.textContent=`作者 ${post.author||"匿名垃圾人"}`;els.featuredDate.textContent=formatDate(post.createdAt);}
     function renderFilters(){const categories=["全部",...(state.stats.categories||[]).map((item)=>item.name)];els.categoryFilters.innerHTML=categories.map((category)=>`<button class="tag-filter ${state.filteredCategory===category?"active":""}" data-category="${category}">${category}</button>`).join("");els.categoryFilters.querySelectorAll("[data-category]").forEach((button)=>{button.addEventListener("click",()=>{state.filteredCategory=button.dataset.category;renderFeed();renderFilters();});});}
     function filteredPosts(){return state.filteredCategory==="全部"?state.posts:state.posts.filter((post)=>post.category===state.filteredCategory);}
-    function renderFeed(){const posts=filteredPosts();if(!posts.length){els.postFeed.innerHTML='<div class="card empty">這個分類目前沒有垃圾新聞。</div>';return;}els.postFeed.innerHTML=posts.map((post)=>`<article class="card story"><div class="story-top"><div><div class="badge">${post.category}</div><h3>${post.title}</h3></div><div class="pill">${formatDate(post.createdAt)}</div></div><p class="story-summary">${post.summary||post.content.slice(0,90)}</p><p>${post.content}</p><div class="story-actions"><div class="reaction-group"><button class="reaction-btn" data-reaction="fire" data-id="${post.id}">火熱 ${post.reactions?.fire||0}</button><button class="reaction-btn" data-reaction="trash" data-id="${post.id}">垃圾 ${post.reactions?.trash||0}</button></div><div>作者 ${post.author||"匿名垃圾人"}</div></div></article>`).join("");els.postFeed.querySelectorAll("[data-reaction]").forEach((button)=>{button.addEventListener("click",()=>reactToPost(button.dataset.id,button.dataset.reaction));});}
-    function render(){renderHeadline();renderStats();renderFilters();renderFeed();}
-    async function reactToPost(postId,type){try{if(state.sourceMode!=="live"){const post=state.posts.find((item)=>item.id===postId);if(post){post.reactions[type]+=1;state.stats.totalFire=state.posts.reduce((sum,item)=>sum+item.reactions.fire,0);state.stats.totalTrash=state.posts.reduce((sum,item)=>sum+item.reactions.trash,0);render();setFlash("展示模式已模擬投票，部署 API 後會真正寫入資料庫。");}return;}await apiFetch(`/api/posts/${postId}/reactions`,{method:"POST",body:JSON.stringify({type})});await loadPosts();setFlash("互動已送出。");}catch(error){setFlash(error.message,true);}}
-    async function handleSubmit(event){event.preventDefault();const formData=new FormData(els.postForm);const payload=Object.fromEntries(formData.entries());if(!payload.title?.trim()||!payload.content?.trim()){setFlash("標題與內文不能空白。",true);return;}if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先部署並設定 API 才能真正發文。",true);return;}els.submitBtn.disabled=true;try{await apiFetch("/api/posts",{method:"POST",body:JSON.stringify(payload)});els.postForm.reset();setFlash("文章已發佈。");await loadPosts();}catch(error){setFlash(error.message,true);}finally{els.submitBtn.disabled=false;}}
-    els.postForm.addEventListener("submit",handleSubmit);els.refreshBtn.addEventListener("click",()=>{setFlash("重新抓取文章列表。");loadPosts();});state.apiUrl=resolveApiUrl();loadPosts();
+    function renderFeed(){const posts=filteredPosts();if(!posts.length){els.postFeed.innerHTML='<div class="card empty">目前沒有文章。</div>';return;}els.postFeed.innerHTML=posts.map((post)=>`<article class="card story"><div><div class="badge">${post.category||"未分類"}</div><h3>${post.title}</h3></div><p class="story-summary">${post.summary||""}</p><p>${post.content}</p><div class="story-actions"><div class="reaction-group"><button class="reaction-btn" data-reaction="fire" data-id="${post.id}">火熱 ${post.reactions?.fire||0}</button><button class="reaction-btn" data-reaction="trash" data-id="${post.id}">垃圾 ${post.reactions?.trash||0}</button></div><div>${post.author||"匿名垃圾人"} · ${formatDate(post.createdAt)}</div></div></article>`).join("");els.postFeed.querySelectorAll("[data-reaction]").forEach((button)=>{button.addEventListener("click",()=>reactToPost(button.dataset.id,button.dataset.reaction));});}
+    function renderAdmin(){els.adminPasswordInput.value=state.adminPassword;els.adminControls.classList.toggle("hidden",!state.adminLoggedIn);els.adminLogoutBtn.classList.toggle("hidden",!state.adminLoggedIn);els.adminLoginBtn.classList.toggle("hidden",state.adminLoggedIn);if(!state.adminLoggedIn){els.adminPostList.innerHTML="";return;}if(!state.posts.length){els.adminPostList.innerHTML='<div class="admin-item">目前沒有文章可管理。</div>';return;}els.adminPostList.innerHTML=state.posts.map((post)=>`<div class="admin-item"><strong>${post.title}</strong><div style="margin:8px 0 12px;color:#6d6258">${post.category||"未分類"} · ${post.author||"匿名垃圾人"}</div><div class="btn-row"><button class="btn" data-edit="${post.id}">編輯</button><button class="btn" data-feature="${post.id}">設為頭條</button></div></div>`).join("");els.adminPostList.querySelectorAll("[data-edit]").forEach((button)=>button.addEventListener("click",()=>populateEditor(button.dataset.edit)));els.adminPostList.querySelectorAll("[data-feature]").forEach((button)=>button.addEventListener("click",()=>featurePost(button.dataset.feature)));}
+    function render(){renderHeadline();renderFilters();renderFeed();renderAdmin();}
+    async function reactToPost(postId,type){try{if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先連上 API。",true);return;}await apiFetch(`/api/posts/${postId}/reactions`,{method:"POST",body:JSON.stringify({type})});await loadPosts();}catch(error){setFlash(error.message,true);}}
+    function populateEditor(postId){const post=state.posts.find((item)=>item.id===postId);if(!post) return;els.postForm.dataset.editingId=post.id;document.getElementById("titleInput").value=post.title||"";document.getElementById("authorInput").value=post.author||"";document.getElementById("categoryInput").value=post.category||"";document.getElementById("summaryInput").value=post.summary||"";document.getElementById("contentInput").value=post.content||"";setFlash(`正在編輯：${post.title}`);window.scrollTo({top:0,behavior:"smooth"});}
+    async function featurePost(postId){try{await apiFetch(`/api/posts/${postId}/feature`,{method:"PATCH"});setFlash("已設為頭條。");await loadPosts();}catch(error){setFlash(error.message,true);}}
+    async function handleSubmit(event){event.preventDefault();const payload=Object.fromEntries(new FormData(els.postForm).entries());if(!payload.title?.trim()||!payload.content?.trim()){setFlash("標題與內文不能空白。",true);return;}if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先連上 API。",true);return;}els.submitBtn.disabled=true;try{const editingId=els.postForm.dataset.editingId;if(editingId){await apiFetch(`/api/posts/${editingId}`,{method:"PATCH",body:JSON.stringify(payload)});delete els.postForm.dataset.editingId;setFlash("文章已更新。");}else{await apiFetch("/api/posts",{method:"POST",body:JSON.stringify(payload)});setFlash("文章已發佈。");}els.postForm.reset();await loadPosts();}catch(error){setFlash(error.message,true);}finally{els.submitBtn.disabled=false;}}
+    async function adminLogin(){state.adminPassword=els.adminPasswordInput.value.trim();try{await apiFetch("/api/admin/login",{method:"POST"});state.adminLoggedIn=true;localStorage.setItem("garbage-news-admin-password",state.adminPassword);setAdminStatus("管理員已登入。");await loadPosts();}catch(error){state.adminLoggedIn=false;setAdminStatus(error.message,true);}}
+    function adminLogout(){state.adminLoggedIn=false;state.adminPassword="";localStorage.removeItem("garbage-news-admin-password");els.postForm.reset();delete els.postForm.dataset.editingId;setAdminStatus("尚未登入");renderAdmin();}
+    async function clearPosts(){try{await apiFetch("/api/admin/reset",{method:"POST"});setFlash("文章已清空。");await loadPosts();}catch(error){setFlash(error.message,true);}}
+    els.postForm.addEventListener("submit",handleSubmit);els.refreshBtn.addEventListener("click",()=>loadPosts());els.adminLoginBtn.addEventListener("click",adminLogin);els.adminLogoutBtn.addEventListener("click",adminLogout);els.clearPostsBtn.addEventListener("click",clearPosts);
+    state.apiUrl=resolveApiUrl();if(state.adminPassword) els.adminPasswordInput.value=state.adminPassword;loadPosts();
   </script>
 </body>
 </html>

@@ -166,25 +166,17 @@ export class NewsBoard {
     const url = new URL(request.url);
     const data = await this.loadData();
 
-    if (request.method === "GET" && url.pathname === "/api/health") {
-      return json({ success: true, service: "garbage-news-api", stats: buildStats(data.posts) });
-    }
-
     if (request.method === "GET" && url.pathname === "/api/posts") {
       return json({ success: true, ...serializeState(data) });
     }
 
     if (request.method === "POST" && url.pathname === "/api/admin/login") {
-      if (!isAdmin(request, this.env)) {
-        return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
-      }
+      if (!isAdmin(request, this.env)) return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
       return json({ success: true, message: "管理員登入成功" });
     }
 
     if (request.method === "POST" && url.pathname === "/api/admin/reset") {
-      if (!isAdmin(request, this.env)) {
-        return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
-      }
+      if (!isAdmin(request, this.env)) return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
       const cleared = { ...EMPTY_STATE };
       await this.saveData(cleared);
       return json({ success: true, message: "文章已清空", ...serializeState(cleared) });
@@ -193,18 +185,9 @@ export class NewsBoard {
     if (request.method === "POST" && url.pathname === "/api/posts") {
       const parsed = validatePostInput(await readJson(request));
       if (parsed.error) return json({ success: false, message: parsed.error }, { status: 400 });
-
       data.postSequence += 1;
       const now = new Date().toISOString();
-      const post = {
-        id: createPostId(data.postSequence),
-        slug: createSlug(parsed.value.title),
-        createdAt: now,
-        updatedAt: now,
-        featured: false,
-        reactions: { fire: 0, trash: 0 },
-        ...parsed.value
-      };
+      const post = { id: createPostId(data.postSequence), slug: createSlug(parsed.value.title), createdAt: now, updatedAt: now, featured: false, reactions: { fire: 0, trash: 0 }, ...parsed.value };
       data.posts.unshift(post);
       await this.saveData(data);
       return json({ success: true, message: "文章發佈成功", post, ...serializeState(data) }, { status: 201 });
@@ -212,19 +195,12 @@ export class NewsBoard {
 
     const editMatch = url.pathname.match(/^\/api\/posts\/([^/]+)$/);
     if (editMatch && request.method === "PATCH") {
-      if (!isAdmin(request, this.env)) {
-        return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
-      }
+      if (!isAdmin(request, this.env)) return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
       const post = data.posts.find((item) => item.id === editMatch[1]);
       if (!post) return json({ success: false, message: "找不到文章" }, { status: 404 });
-
       const parsed = validatePostInput(await readJson(request));
       if (parsed.error) return json({ success: false, message: parsed.error }, { status: 400 });
-
-      Object.assign(post, parsed.value, {
-        slug: createSlug(parsed.value.title),
-        updatedAt: new Date().toISOString()
-      });
+      Object.assign(post, parsed.value, { slug: createSlug(parsed.value.title), updatedAt: new Date().toISOString() });
       await this.saveData(data);
       return json({ success: true, message: "文章已更新", post, ...serializeState(data) });
     }
@@ -233,12 +209,8 @@ export class NewsBoard {
     if (reactionMatch && request.method === "POST") {
       const post = data.posts.find((item) => item.id === reactionMatch[1]);
       if (!post) return json({ success: false, message: "找不到文章" }, { status: 404 });
-
       const type = String((await readJson(request)).type || "");
-      if (!ALLOWED_REACTIONS.has(type)) {
-        return json({ success: false, message: "不支援的互動類型" }, { status: 400 });
-      }
-
+      if (!ALLOWED_REACTIONS.has(type)) return json({ success: false, message: "不支援的互動類型" }, { status: 400 });
       post.reactions[type] += 1;
       await this.saveData(data);
       return json({ success: true, message: "互動已送出", post, stats: buildStats(data.posts) });
@@ -246,12 +218,9 @@ export class NewsBoard {
 
     const featureMatch = url.pathname.match(/^\/api\/posts\/([^/]+)\/feature$/);
     if (featureMatch && request.method === "PATCH") {
-      if (!isAdmin(request, this.env)) {
-        return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
-      }
+      if (!isAdmin(request, this.env)) return json({ success: false, message: "管理員密碼錯誤" }, { status: 401 });
       const post = data.posts.find((item) => item.id === featureMatch[1]);
       if (!post) return json({ success: false, message: "找不到文章" }, { status: 404 });
-
       for (const item of data.posts) item.featured = false;
       post.featured = true;
       post.updatedAt = new Date().toISOString();

@@ -31,7 +31,6 @@
     .status-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{padding:18px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.8)}.metric strong{display:block;font-size:36px;margin-top:8px;line-height:1}
     .meta,.feed,.composer,.compose-grid,.field{display:grid;gap:12px}.toolbar{margin:22px 0;justify-content:space-between;align-items:center;padding:0 4px}
     .tag-filter{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:10px 14px;cursor:pointer;font:inherit;font-weight:800;transition:.2s ease}.tag-filter.active,.tag-filter:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-    .api-box{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--muted);font-size:14px}.api-box code{padding:6px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink)}
     .story{gap:16px}.story-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.story h3{font-size:32px;line-height:1.08;margin-top:8px}.story p{margin:0;line-height:1.8;color:#3f352e}.story-summary{font-size:16px;color:var(--muted)}
     .story-actions{align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line)}
     .reaction-btn,.ghost-btn,.primary-btn{border:0;cursor:pointer;font:inherit;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
@@ -54,21 +53,11 @@
         <div class="brand-inner">
           <div class="eyebrow">Independent nonsense press</div>
           <h1>超級垃圾新聞網</h1>
-          <p>這不是正經媒體。這是一個可以匿名發表荒謬新聞、即時顯示文章、並且能部署在 GitHub Pages 上的垃圾風格內容站。前端是純靜態頁，後端可接免費 Cloudflare Worker 資料 API。</p>
         </div>
       </div>
       <aside class="card status-panel">
-        <div><div class="panel-label">System</div><h2 style="margin-top:10px;font-size:38px">即時垃圾指數</h2></div>
-        <div class="status-row">
-          <div class="metric"><span>文章數</span><strong id="totalPosts">0</strong></div>
-          <div class="metric"><span>火熱票數</span><strong id="totalFire">0</strong></div>
-          <div class="metric"><span>垃圾票數</span><strong id="totalTrash">0</strong></div>
-        </div>
-        <div class="meta">
-          <div class="pill">API 狀態 <span id="apiStatusText">偵測中</span></div>
-          <div class="pill">資料來源 <span id="apiModeText">尚未載入</span></div>
-          <div class="help">第一次部署 Worker 後，可用網址列 `?api=https://你的-worker.workers.dev` 設定 API。頁面會自動記住，之後不必重設。</div>
-        </div>
+        <div><div class="panel-label">Newsroom</div><h2 style="margin-top:10px;font-size:38px">最新文章</h2></div>
+        <div class="help">登入管理員後可編輯文章與設定頭條。</div>
       </aside>
     </section>
 
@@ -89,7 +78,7 @@
         <form id="postForm" class="compose-grid">
           <div class="field"><label for="titleInput">標題</label><input id="titleInput" name="title" maxlength="80" placeholder="例如：公司印表機宣布參選里長" required /></div>
           <div class="field"><label for="authorInput">作者</label><input id="authorInput" name="author" maxlength="24" placeholder="匿名垃圾人" /></div>
-          <div class="field"><label for="categoryInput">分類</label><select id="categoryInput" name="category"><option>都市傳說</option><option>荒謬職場</option><option>假科學</option><option>名人亂象</option><option>社群災情</option><option>未分類</option></select></div>
+          <div class="field"><label for="categoryInput">分類</label><input id="categoryInput" name="category" maxlength="20" placeholder="自行輸入分類" /></div>
           <div class="field"><label for="summaryInput">摘要</label><input id="summaryInput" name="summary" maxlength="140" placeholder="一句話先把荒謬感打出去" /></div>
           <div class="field"><label for="contentInput">內文</label><textarea id="contentInput" name="content" maxlength="4000" placeholder="把這篇垃圾新聞寫完整。" required></textarea></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="primary-btn" type="submit" id="submitBtn">送出新聞</button><button class="ghost-btn" type="button" id="refreshBtn">重新整理文章</button></div>
@@ -100,7 +89,6 @@
 
     <section class="toolbar">
       <div class="toolbar-left" id="categoryFilters"></div>
-      <div class="toolbar-right api-box"><span>目前 API</span><code id="apiUrlDisplay">demo mode</code></div>
     </section>
 
     <section class="layout">
@@ -116,19 +104,17 @@
   </main>
 
   <script>
-    const DEMO_STATE={posts:[{id:"trash-001",title:"外星人深夜降落士林夜市，只為了學鐵板麵加蛋",author:"垃圾線民",category:"都市傳說",summary:"目擊者表示，飛碟停在捷運站上空三分鐘，最後只帶走黑胡椒醬。",content:"昨天凌晨兩點，士林夜市上空出現不明強光。多名攤販指出，三名自稱來自『第八象限』的外星人走下飛碟後，沒有攻擊地球，只是反覆詢問鐵板麵能不能雙蛋。攤販最後以加麵不加價平息場面，現場一度被民眾誤認為新型排隊名店。",createdAt:"2026-03-28T12:20:00.000Z",featured:true,reactions:{fire:12,trash:2}},{id:"trash-002",title:"公司老闆請假三天，辦公椅暫代 CEO 並通過預算",author:"會議室觀察員",category:"荒謬職場",summary:"與會主管一致認為那張椅子的領導氣場比真人穩定。",content:"一間新創公司本週召開季度預算會議時，執行長臨時缺席。由於投影機已開、咖啡已到，團隊決定讓他平常坐的黑色辦公椅擺在主位。令人震驚的是，整場會議進行得異常順利，三個部門的預算案全部在十分鐘內通過，還有人主張明年直接讓椅子升任董事長。",createdAt:"2026-03-29T04:10:00.000Z",featured:false,reactions:{fire:21,trash:4}},{id:"trash-003",title:"氣象局改用珍珠奶茶預測天氣，甜度越高降雨機率越大",author:"微糖特派",category:"假科學",summary:"研究團隊強調，半糖是低氣壓，正常糖是梅雨鋒面。",content:"最新民間研究指出，珍珠奶茶甜度與大氣含水量具有神祕同步性。研究人員把一整排飲料杯放在陽台觀測，發現正常糖當天幾乎都會下雨，無糖則容易吹東北季風。雖然學界尚未承認這套模型，但辦公室同事已決定取消氣象 App，直接以午餐飲料做決策。",createdAt:"2026-03-30T02:00:00.000Z",featured:false,reactions:{fire:35,trash:6}}]};
-    DEMO_STATE.featuredPost=DEMO_STATE.posts.find((post)=>post.featured)||DEMO_STATE.posts[0];
-    DEMO_STATE.stats={totalPosts:DEMO_STATE.posts.length,totalFire:DEMO_STATE.posts.reduce((sum,post)=>sum+post.reactions.fire,0),totalTrash:DEMO_STATE.posts.reduce((sum,post)=>sum+post.reactions.trash,0),categories:Object.entries(DEMO_STATE.posts.reduce((acc,post)=>{acc[post.category]=(acc[post.category]||0)+1;return acc;},{})).map(([name,count])=>({name,count}))};
+    const DEMO_STATE={posts:[],featuredPost:null,stats:{totalPosts:0,totalFire:0,totalTrash:0,categories:[]}};
     const state={apiUrl:"",sourceMode:"demo",posts:[],filteredCategory:"全部",featuredPost:null,stats:DEMO_STATE.stats};
-    const els={totalPosts:document.getElementById("totalPosts"),totalFire:document.getElementById("totalFire"),totalTrash:document.getElementById("totalTrash"),apiStatusText:document.getElementById("apiStatusText"),apiModeText:document.getElementById("apiModeText"),apiUrlDisplay:document.getElementById("apiUrlDisplay"),featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn")};
+    const els={featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn")};
     function resolveApiUrl(){const params=new URLSearchParams(window.location.search);const queryApi=params.get("api");if(queryApi){localStorage.setItem("garbage-news-api",queryApi);return queryApi.replace(/\/$/,"");}const savedApi=localStorage.getItem("garbage-news-api");return savedApi?savedApi.replace(/\/$/,""):"";}
     function setFlash(message,isError=false){els.flashMessage.textContent=message;els.flashMessage.style.color=isError?"#8e2703":"#285943";}
     function formatDate(value){return new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(value));}
     async function apiFetch(path,options={}){if(!state.apiUrl) throw new Error("尚未設定 API");const response=await fetch(`${state.apiUrl}${path}`,{headers:{"Content-Type":"application/json",...(options.headers||{})},...options});const data=await response.json().catch(()=>({}));if(!response.ok) throw new Error(data.message||"API 請求失敗");return data;}
     function applyData(payload,mode){state.sourceMode=mode;state.posts=payload.posts||[];state.featuredPost=payload.featuredPost||state.posts[0]||null;state.stats=payload.stats||{totalPosts:0,totalFire:0,totalTrash:0,categories:[]};render();}
-    async function loadPosts(){els.apiStatusText.textContent="載入中";try{if(!state.apiUrl){applyData(DEMO_STATE,"demo");els.apiStatusText.textContent="展示模式";return;}const payload=await apiFetch("/api/posts");applyData(payload,"live");els.apiStatusText.textContent="已連線";}catch(error){applyData(DEMO_STATE,"demo");els.apiStatusText.textContent="連線失敗";setFlash(`API 無法連線，已切換展示模式：${error.message}`,true);}}
+    async function loadPosts(){try{if(!state.apiUrl){applyData(DEMO_STATE,"demo");return;}const payload=await apiFetch("/api/posts");applyData(payload,"live");}catch(error){applyData(DEMO_STATE,"demo");setFlash(`API 無法連線，已切換展示模式：${error.message}`,true);}}
     function renderHeadline(){const post=state.featuredPost;if(!post){els.featuredTitle.textContent="目前沒有頭條";els.featuredSummary.textContent="請先發表第一篇垃圾新聞。";els.featuredContent.textContent="";return;}els.featuredTitle.classList.remove("loading");els.featuredTitle.textContent=post.title;els.featuredSummary.textContent=post.summary||post.content.slice(0,100);els.featuredContent.textContent=post.content;els.featuredCategory.textContent=`分類 ${post.category}`;els.featuredAuthor.textContent=`作者 ${post.author||"匿名垃圾人"}`;els.featuredDate.textContent=formatDate(post.createdAt);}
-    function renderStats(){els.totalPosts.textContent=state.stats.totalPosts||0;els.totalFire.textContent=state.stats.totalFire||0;els.totalTrash.textContent=state.stats.totalTrash||0;els.apiModeText.textContent=state.sourceMode==="live"?"Cloudflare / 自架 API":"內建展示資料";els.apiUrlDisplay.textContent=state.apiUrl||"demo mode";}
+    function renderStats(){}
     function renderFilters(){const categories=["全部",...(state.stats.categories||[]).map((item)=>item.name)];els.categoryFilters.innerHTML=categories.map((category)=>`<button class="tag-filter ${state.filteredCategory===category?"active":""}" data-category="${category}">${category}</button>`).join("");els.categoryFilters.querySelectorAll("[data-category]").forEach((button)=>{button.addEventListener("click",()=>{state.filteredCategory=button.dataset.category;renderFeed();renderFilters();});});}
     function filteredPosts(){return state.filteredCategory==="全部"?state.posts:state.posts.filter((post)=>post.category===state.filteredCategory);}
     function renderFeed(){const posts=filteredPosts();if(!posts.length){els.postFeed.innerHTML='<div class="card empty">這個分類目前沒有垃圾新聞。</div>';return;}els.postFeed.innerHTML=posts.map((post)=>`<article class="card story"><div class="story-top"><div><div class="badge">${post.category}</div><h3>${post.title}</h3></div><div class="pill">${formatDate(post.createdAt)}</div></div><p class="story-summary">${post.summary||post.content.slice(0,90)}</p><p>${post.content}</p><div class="story-actions"><div class="reaction-group"><button class="reaction-btn" data-reaction="fire" data-id="${post.id}">火熱 ${post.reactions?.fire||0}</button><button class="reaction-btn" data-reaction="trash" data-id="${post.id}">垃圾 ${post.reactions?.trash||0}</button></div><div>作者 ${post.author||"匿名垃圾人"}</div></div></article>`).join("");els.postFeed.querySelectorAll("[data-reaction]").forEach((button)=>{button.addEventListener("click",()=>reactToPost(button.dataset.id,button.dataset.reaction));});}

@@ -1,12 +1,12 @@
 {
-  "name": "counter-api",
+  "name": "garbage-news-api",
   "main": "src/index.js",
-  "compatibility_date": "2026-03-28",
+  "compatibility_date": "2026-03-30",
   "durable_objects": {
     "bindings": [
       {
-        "name": "COUNTER",
-        "class_name": "CounterState"
+        "name": "NEWS_BOARD",
+        "class_name": "NewsBoard"
       }
     ]
   },
@@ -14,11 +14,11 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
-        "CounterState"
+        "NewsBoard"
       ]
     }
   ],
   "vars": {
-    "CORS_ORIGIN": "https://1ch666.github.io"
+    "CORS_ORIGIN": "*"
   }
 }

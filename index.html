@@ -1,793 +1,141 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>飲料冰品店點餐系統</title>
+  <title>超級垃圾新聞網</title>
+  <meta name="description" content="一個荒謬、即時、可匿名發文的垃圾新聞站，前端可部署在 GitHub Pages，後端可接免費 Cloudflare Worker API。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@40&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg:#f7f1e8;
-      --card:#fffaf2;
-      --ink:#2b241e;
-      --muted:#6f655d;
-      --line:#e6d8c6;
-      --accent:#b85c16;
-      --accent-2:#7c3f10;
-      --drink:#155e75;
-      --ice:#0f766e;
-      --danger:#b42318;
-      --ok:#166534;
-      --shadow:0 12px 26px rgba(74,45,14,.08);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#fbf5eb,#efe1cb);color:var(--ink)}
-    .app{max-width:1440px;margin:0 auto;padding:24px}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
-    .title h1{margin:0;font-size:32px}
-    .title p{margin:8px 0 0;color:var(--muted)}
-    .pill{padding:10px 14px;border-radius:999px;background:#fff7ec;border:1px solid var(--line);color:var(--muted)}
-    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
-    .tab{border:0;border-radius:999px;padding:12px 18px;background:#fff7eb;color:var(--ink);cursor:pointer;font:inherit;font-weight:700}
-    .tab.active{background:var(--accent);color:#fff}
-    .view{display:none}
-    .view.active{display:block}
-    .grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{display:grid;gap:16px}
-    .grid-hero{grid-template-columns:1.1fr 1fr}
-    .grid-counter{grid-template-columns:1.15fr .95fr}
-    .grid-board,.grid-two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid-four{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .card{background:rgba(255,250,242,.95);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
-    .section{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-    .section h2,.section h3{margin:0}
-    .muted{font-size:14px;color:var(--muted)}
-    .displayHero{min-height:260px;display:grid;place-items:center;text-align:center}
-    .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
-    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
-    .chip{min-height:80px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}
-    .empty{padding:20px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted);background:#fffaf6}
-    .list,.stack{display:grid;gap:12px}
-    .group{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fffdf9}
-    .item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .qty{display:flex;align-items:center;gap:8px}
-    .qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer;font-weight:900}
-    .qty span{min-width:30px;text-align:center;font-weight:800}
-    .summaryRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
-    .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}
-    .toggle:checked{background:var(--accent)}
-    .toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
-    .toggle:checked:after{transform:translateX(26px)}
-    input,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit}
-    textarea{min-height:88px;resize:vertical}
-    .btns{display:flex;flex-wrap:wrap;gap:10px}
-    .btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit;font-weight:700}
-    .primary{background:var(--accent);color:#fff}
-    .secondary{background:#fff;border:1px solid var(--line)}
-    .drink{background:rgba(21,94,117,.12);color:var(--drink)}
-    .ice{background:rgba(15,118,110,.12);color:var(--ice)}
-    .ok{background:rgba(22,101,52,.12);color:var(--ok)}
-    .danger{background:rgba(180,35,24,.12);color:var(--danger)}
-    .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
-    .metric strong{display:block;font-size:30px;margin-top:8px}
-    .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
-    .dangerPanel{padding:18px;border:1px solid rgba(180,35,24,.22);border-radius:20px;background:linear-gradient(180deg,rgba(180,35,24,.08),rgba(180,35,24,.02))}
-    .dangerPanel strong{color:var(--danger)}
-    .dangerButton{background:linear-gradient(180deg,#cf3b2d,#a61f15);color:#fff;box-shadow:0 10px 22px rgba(180,35,24,.22)}
-    .dangerButton:hover{filter:brightness(1.03)}
-    .actionText{font-size:14px;color:var(--muted)}
-    .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
-    .orderHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-    .orderId{font-size:24px;font-weight:900}
-    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-    .tag{padding:5px 10px;border-radius:999px;background:#f3e7d3;font-size:12px}
-    .note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-    th{color:var(--muted);font-weight:700}
-    @media (max-width:1100px){.grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{grid-template-columns:1fr}}
-    @media (max-width:720px){.top{flex-direction:column}.summaryRow{grid-template-columns:1fr}}
+    :root{--bg:#f2eadf;--paper:#f7f2ea;--ink:#171411;--muted:#665b50;--line:rgba(23,20,17,.12);--accent:#cb4b16;--accent-dark:#8e2703;--gold:#d1a13d;--card:#fffdfa;--shadow:0 20px 50px rgba(36,25,15,.08);--radius:28px}
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:radial-gradient(circle at top left,rgba(203,75,22,.14),transparent 28%),radial-gradient(circle at 85% 10%,rgba(209,161,61,.16),transparent 20%),linear-gradient(180deg,#efe4d4 0%,#f8f3eb 42%,#f0e6d8 100%)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(23,20,17,.04) 1px,transparent 1px);background-size:100% 7px;mix-blend-mode:multiply}
+    .shell{max-width:1320px;margin:0 auto;padding:28px 20px 56px;position:relative}
+    .masthead,.hero-grid,.layout{display:grid;gap:18px}.masthead{grid-template-columns:1.2fr .8fr}.hero-grid,.layout{grid-template-columns:1.15fr .85fr;align-items:start}
+    .brand,.card{border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}.brand{background:linear-gradient(135deg,rgba(255,252,246,.96),rgba(245,235,221,.95));border-radius:36px;position:relative}.card{background:rgba(255,253,250,.9);border-radius:var(--radius);backdrop-filter:blur(8px)}
+    .brand:after{content:"垃圾速報";position:absolute;top:18px;right:-38px;transform:rotate(18deg);background:var(--accent);color:#fff6ef;padding:10px 42px;font-weight:900;letter-spacing:.2em;box-shadow:0 12px 24px rgba(142,39,3,.2)}
+    .brand-inner,.headline,.status-panel,.story,.composer{padding:24px}.brand-inner{padding:34px}
+    .eyebrow,.panel-label{text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--accent-dark);font-weight:900}
+    h1,h2,h3{margin:0;font-family:"DM Serif Display","Noto Serif TC",serif;font-weight:400;line-height:1} h1{font-size:clamp(48px,8vw,96px);margin-top:10px;max-width:10ch}
+    .brand p{margin:18px 0 0;max-width:56ch;color:var(--muted);line-height:1.75;font-size:16px}
+    .headline{display:grid;gap:18px;min-height:520px}.headline-title{font-size:clamp(34px,5.2vw,66px);line-height:1.02;max-width:12ch}
+    .badge,.pill,.reaction-btn,.tag-filter{display:inline-flex;align-items:center}.badge{gap:8px;width:max-content;padding:8px 14px;border-radius:999px;background:rgba(203,75,22,.1);color:var(--accent-dark);font-size:13px;font-weight:800}
+    .headline-summary{font-size:18px;line-height:1.75;color:var(--muted);max-width:44ch}.headline-content{font-size:15px;line-height:1.9;color:#332a24;padding-top:18px;border-top:1px solid var(--line)}
+    .headline-footer,.toolbar,.toolbar-left,.toolbar-right,.status-row,.reaction-group,.story-actions{display:flex;flex-wrap:wrap;gap:10px}
+    .headline-footer{gap:10px 16px;align-items:center;color:var(--muted);font-size:14px}
+    .pill{gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:700}
+    .status-panel{display:grid;gap:18px;background:linear-gradient(180deg,rgba(255,249,240,.96),rgba(248,239,226,.94)),repeating-linear-gradient(135deg,transparent 0 14px,rgba(23,20,17,.015) 14px 28px)}
+    .status-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{padding:18px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.8)}.metric strong{display:block;font-size:36px;margin-top:8px;line-height:1}
+    .meta,.feed,.composer,.compose-grid,.field{display:grid;gap:12px}.toolbar{margin:22px 0;justify-content:space-between;align-items:center;padding:0 4px}
+    .tag-filter{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:10px 14px;cursor:pointer;font:inherit;font-weight:800;transition:.2s ease}.tag-filter.active,.tag-filter:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .api-box{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--muted);font-size:14px}.api-box code{padding:6px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink)}
+    .story{gap:16px}.story-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.story h3{font-size:32px;line-height:1.08;margin-top:8px}.story p{margin:0;line-height:1.8;color:#3f352e}.story-summary{font-size:16px;color:var(--muted)}
+    .story-actions{align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line)}
+    .reaction-btn,.ghost-btn,.primary-btn{border:0;cursor:pointer;font:inherit;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+    .reaction-btn{padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800}.reaction-btn:hover,.ghost-btn:hover,.primary-btn:hover{transform:translateY(-1px)}
+    .primary-btn{padding:13px 18px;border-radius:18px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 14px 26px rgba(142,39,3,.2);font-weight:900}
+    .ghost-btn{padding:12px 16px;border-radius:18px;background:#fff;border:1px solid var(--line);font-weight:800}
+    .composer{position:sticky;top:20px}.field label{font-size:13px;font-weight:900;letter-spacing:.08em;color:var(--accent-dark)}
+    input,textarea,select{width:100%;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);font:inherit;padding:14px 16px} textarea{min-height:140px;resize:vertical}
+    .help{font-size:13px;line-height:1.7;color:var(--muted);padding:14px 16px;border-radius:18px;border:1px dashed var(--line);background:rgba(255,249,240,.88)}
+    .flash{min-height:24px;color:var(--accent-dark);font-size:14px;font-weight:700}.empty{padding:30px 24px;text-align:center;color:var(--muted)}.footer{margin-top:28px;text-align:center;color:var(--muted);font-size:14px}.loading{animation:glow 1.1s ease-in-out infinite alternate}
+    @keyframes glow{from{opacity:.58}to{opacity:1}}
+    @media (max-width:1080px){.masthead,.hero-grid,.layout{grid-template-columns:1fr}.composer{position:static}.headline{min-height:auto}}
+    @media (max-width:720px){.shell{padding:16px 14px 40px}.brand-inner,.headline,.status-panel,.story,.composer{padding:20px}.status-row{grid-template-columns:1fr}.story h3{font-size:26px}.headline-title{max-width:none}}
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="top">
-      <div class="title">
-        <h1>飲料冰品店點餐系統</h1>
-      </div>
-      <div class="pill" id="connectionStatus">連線中...</div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-view="displayView">顯示頁</button>
-      <button class="tab" data-view="counterView">櫃台頁</button>
-      <button class="tab" data-view="kitchenView">製作頁</button>
-      <button class="tab" data-view="manageView">管理頁</button>
-    </div>
-
-    <section class="view active" id="displayView">
-      <div class="grid-hero">
-        <div class="card displayHero">
-          <div>
-            <div class="muted">目前叫號</div>
-            <div class="big" id="currentPickupDisplay">--</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="section">
-            <h2>等待中的號碼</h2>
-            <span class="muted" id="waitingCount">0 組</span>
-          </div>
-          <div class="chips" id="waitingList"></div>
+  <main class="shell">
+    <section class="masthead">
+      <div class="brand">
+        <div class="brand-inner">
+          <div class="eyebrow">Independent nonsense press</div>
+          <h1>超級垃圾新聞網</h1>
+          <p>這不是正經媒體。這是一個可以匿名發表荒謬新聞、即時顯示文章、並且能部署在 GitHub Pages 上的垃圾風格內容站。前端是純靜態頁，後端可接免費 Cloudflare Worker 資料 API。</p>
         </div>
       </div>
+      <aside class="card status-panel">
+        <div><div class="panel-label">System</div><h2 style="margin-top:10px;font-size:38px">即時垃圾指數</h2></div>
+        <div class="status-row">
+          <div class="metric"><span>文章數</span><strong id="totalPosts">0</strong></div>
+          <div class="metric"><span>火熱票數</span><strong id="totalFire">0</strong></div>
+          <div class="metric"><span>垃圾票數</span><strong id="totalTrash">0</strong></div>
+        </div>
+        <div class="meta">
+          <div class="pill">API 狀態 <span id="apiStatusText">偵測中</span></div>
+          <div class="pill">資料來源 <span id="apiModeText">尚未載入</span></div>
+          <div class="help">第一次部署 Worker 後，可用網址列 `?api=https://你的-worker.workers.dev` 設定 API。頁面會自動記住，之後不必重設。</div>
+        </div>
+      </aside>
     </section>
 
-    <section class="view" id="counterView">
-      <div class="grid-counter">
-        <div class="card">
-          <div class="section">
-            <h2>櫃台點餐</h2>
-            <span class="muted">登入後即可建立訂單、叫號與查看即時統計。</span>
-          </div>
-          <div id="counterGate" class="notice">請先在右側輸入櫃台密碼登入。</div>
-          <div id="counterContent" style="display:none">
-            <div class="grid-two">
-              <div class="group">
-                <div class="section">
-                  <h3>飲料區</h3>
-                  <span class="muted">點一下加減數量</span>
-                </div>
-                <div class="list" id="drinkProducts"></div>
-              </div>
-              <div class="group">
-                <div class="section">
-                  <h3>冰品區</h3>
-                  <span class="muted">支援混合訂單</span>
-                </div>
-                <div class="list" id="iceProducts"></div>
-              </div>
-            </div>
-            <div class="card" style="margin-top:16px;padding:16px">
-              <div class="section">
-                <h3>訂單明細</h3>
-                <span class="muted" id="summaryCount">0 項</span>
-              </div>
-              <div class="stack" id="orderSummary"></div>
-              <div class="switch" style="margin-top:14px">
-                <div>
-                  <strong>需要取餐號</strong>
-                  <div class="muted">開啟後會自動產生 A001 形式號碼</div>
-                </div>
-                <input type="checkbox" class="toggle" id="needsPickupToggle" />
-              </div>
-              <div style="margin-top:14px">
-                <label for="orderNote">備註</label>
-                <textarea id="orderNote" placeholder="例如：少冰、不要煉乳、分開裝"></textarea>
-              </div>
-              <div class="card" style="margin-top:14px;padding:16px;background:#fde8c4">
-                訂單總價
-                <strong id="totalAmount" style="display:block;font-size:38px;margin-top:6px">$0</strong>
-              </div>
-              <div class="btns" style="margin-top:14px">
-                <button class="btn primary" id="createOrderBtn">建立訂單</button>
-                <button class="btn secondary" id="clearOrderBtn">清空內容</button>
-              </div>
-            </div>
-          </div>
+    <section class="hero-grid">
+      <article class="card headline">
+        <div><div class="badge">頭條垃圾</div><h2 class="headline-title loading" id="featuredTitle">頭條載入中...</h2><p class="headline-summary" id="featuredSummary">正在從垃圾宇宙抓取最新資訊。</p></div>
+        <div class="headline-content" id="featuredContent">請稍候。</div>
+        <div class="headline-footer">
+          <span class="pill" id="featuredCategory">分類 --</span>
+          <span id="featuredAuthor">作者 --</span>
+          <span id="featuredDate">時間 --</span>
         </div>
+      </article>
 
-        <div class="stack">
-          <div class="card">
-            <div class="section">
-              <h2>櫃台登入</h2>
-              <span class="muted" id="loginStateText">尚未登入</span>
-            </div>
-            <div class="stack">
-              <input id="passwordInput" type="password" placeholder="輸入櫃台密碼" />
-              <div class="btns">
-                <button class="btn primary" id="loginBtn">登入櫃台</button>
-                <button class="btn secondary" id="logoutBtn" style="display:none">登出</button>
-              </div>
-              <div class="muted" id="loginMessage"></div>
-            </div>
-          </div>
-          <div class="card" id="callingControlsCard" style="display:none">
-            <div class="section">
-              <h2>叫號控制</h2>
-              <span class="muted">只會叫到有取餐號的訂單</span>
-            </div>
-            <div class="grid-two">
-              <div class="metric"><span class="muted">目前叫號</span><strong id="counterCurrentPickup">--</strong></div>
-              <div class="metric"><span class="muted">等待數量</span><strong id="counterWaitingCount">0</strong></div>
-            </div>
-            <div class="btns" style="margin-top:14px">
-              <button class="btn primary" id="callNextBtn">叫下一號</button>
-              <button class="btn secondary" id="recallCurrentBtn">重叫目前號碼</button>
-              <button class="btn ice" id="clearCurrentBtn">清除目前號碼</button>
-              <button class="btn danger" id="resetCallingBtn">重設叫號</button>
-            </div>
-            <div class="notice" style="margin-top:14px">
-              <strong>叫號狀態</strong>
-              <div id="callingMessage" class="muted" style="margin-top:8px">尚未操作叫號。</div>
-            </div>
-            <div style="margin-top:14px">
-              <div class="section">
-                <h3>最近叫號</h3>
-                <span class="muted">保留最近 10 筆</span>
-              </div>
-              <div class="chips" id="calledHistory"></div>
-            </div>
-          </div>
-          <div class="card" id="quickStatsCard" style="display:none">
-            <div class="section">
-              <h2>今日快速統計</h2>
-              <span class="muted">櫃台可即時查看</span>
-            </div>
-            <div class="grid-two">
-              <div class="metric"><span class="muted">今日營收</span><strong id="quickRevenue">$0</strong></div>
-              <div class="metric"><span class="muted">今日訂單</span><strong id="quickOrders">0</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <section class="card composer">
+        <div><div class="panel-label">Publish</div><h2 style="margin-top:10px;font-size:40px">發一篇垃圾新聞</h2></div>
+        <div class="help">不用登入。標題與內文送出後會直接寫入後端資料庫。若 API 尚未設定，頁面會進入展示模式，只能讀取預設文章。</div>
+        <form id="postForm" class="compose-grid">
+          <div class="field"><label for="titleInput">標題</label><input id="titleInput" name="title" maxlength="80" placeholder="例如：公司印表機宣布參選里長" required /></div>
+          <div class="field"><label for="authorInput">作者</label><input id="authorInput" name="author" maxlength="24" placeholder="匿名垃圾人" /></div>
+          <div class="field"><label for="categoryInput">分類</label><select id="categoryInput" name="category"><option>都市傳說</option><option>荒謬職場</option><option>假科學</option><option>名人亂象</option><option>社群災情</option><option>未分類</option></select></div>
+          <div class="field"><label for="summaryInput">摘要</label><input id="summaryInput" name="summary" maxlength="140" placeholder="一句話先把荒謬感打出去" /></div>
+          <div class="field"><label for="contentInput">內文</label><textarea id="contentInput" name="content" maxlength="4000" placeholder="把這篇垃圾新聞寫完整。" required></textarea></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="primary-btn" type="submit" id="submitBtn">送出新聞</button><button class="ghost-btn" type="button" id="refreshBtn">重新整理文章</button></div>
+          <div class="flash" id="flashMessage"></div>
+        </form>
+      </section>
     </section>
 
-    <section class="view" id="kitchenView">
-      <div class="card">
-        <div class="section">
-          <h2>製作看板</h2>
-          <span class="muted">飲料和冰品分區顯示，同一筆混合訂單會同步出現。</span>
-        </div>
-        <div id="kitchenGate" class="notice">登入後可操作製作狀態。</div>
-        <div id="kitchenContent" class="grid-board" style="display:none">
-          <div class="card">
-            <div class="section">
-              <h3>飲料區</h3>
-              <span class="muted" id="drinkOrderCount">0 單</span>
-            </div>
-            <div class="stack" id="drinkOrders"></div>
-          </div>
-          <div class="card">
-            <div class="section">
-              <h3>冰品區</h3>
-              <span class="muted" id="iceOrderCount">0 單</span>
-            </div>
-            <div class="stack" id="iceOrders"></div>
-          </div>
-        </div>
-      </div>
+    <section class="toolbar">
+      <div class="toolbar-left" id="categoryFilters"></div>
+      <div class="toolbar-right api-box"><span>目前 API</span><code id="apiUrlDisplay">demo mode</code></div>
     </section>
 
-    <section class="view" id="manageView">
-      <div class="card">
-        <div class="section">
-          <h2>管理統計</h2>
-          <span class="muted">今日營收、各商品銷量、訂單狀態總覽。</span>
-        </div>
-        <div id="manageGate" class="notice">登入後可查看管理資料。</div>
-        <div id="manageContent" style="display:none">
-          <div class="dangerPanel" style="margin-bottom:16px">
-            <div class="section">
-              <h3>管理操作</h3>
-              <span class="muted">重設會清空今日訂單、營收與叫號資料</span>
-            </div>
-            <div class="btns">
-              <button class="btn dangerButton" id="resetDailyBtn">重設今日資料</button>
-            </div>
-            <div class="actionText" id="manageActionMessage" style="margin-top:12px">尚未執行管理操作。</div>
-          </div>
-          <div class="grid-four">
-            <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
-            <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
-            <div class="metric"><span class="muted">待製作</span><strong id="statPending">0</strong></div>
-            <div class="metric"><span class="muted">製作中</span><strong id="statPreparing">0</strong></div>
-          </div>
-          <div class="card" style="margin-top:16px;padding:16px">
-            <div class="section">
-              <h3>商品銷售統計</h3>
-              <span class="muted">依售出數量排序</span>
-            </div>
-            <div id="salesTableWrap"></div>
-          </div>
-          <div class="card" style="margin-top:16px;padding:16px">
-            <div class="section">
-              <h3>今日訂單列表</h3>
-              <span class="muted">未完成訂單可直接取消</span>
-            </div>
-            <div id="ordersTableWrap"></div>
-          </div>
-        </div>
-      </div>
+    <section class="layout">
+      <section class="feed" id="postFeed"></section>
+      <aside class="card composer" style="gap:14px">
+        <div><div class="panel-label">Deploy</div><h2 style="margin-top:10px;font-size:36px">部署方式</h2></div>
+        <div class="help">1. `index.html` 推到 GitHub Pages。 2. `cloudflare-worker/` 用 `wrangler deploy` 部署。 3. 把 Worker 網址加到頁面 `?api=`，或在瀏覽器 localStorage 記住。</div>
+        <div class="help">如果你只想先本地開發，可以跑 `node server/server.js`，前端加上 `?api=http://localhost:3000`。</div>
+      </aside>
     </section>
-  </div>
+
+    <div class="footer">© 2026 LightNews Trash Edition. Built for absurd publishing.</div>
+  </main>
 
   <script>
-    const apiParam = new URLSearchParams(window.location.search).get("api");
-    if (apiParam) {
-      localStorage.setItem("apiBaseUrl", apiParam);
-    }
-
-    const defaultApiBase = window.location.protocol.startsWith("http")
-      ? window.location.origin
-      : "http://localhost:3000";
-
-    const API_BASE = localStorage.getItem("apiBaseUrl") || defaultApiBase;
-    const tabs = [...document.querySelectorAll(".tab")];
-    const state = {
-      token: "",
-      products: [],
-      orders: [],
-      calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] },
-      stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] }
-    };
-    const publicState = { currentPickupNumber: null, waitingPickupNumbers: [] };
-    const cart = new Map();
-
-    const $ = (id) => document.getElementById(id);
-    const api = (path) => `${API_BASE}${path}`;
-    const money = (value) => `$${Number(value || 0).toLocaleString("zh-TW")}`;
-    const time = (value) => new Date(value).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
-    const authHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${state.token}` });
-
-    function setConnection(text, ok = true) {
-      const el = $("connectionStatus");
-      el.textContent = text;
-      el.style.color = ok ? "var(--ok)" : "var(--danger)";
-    }
-
-    function switchView(id) {
-      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === id));
-      document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === id));
-    }
-
-    function setAuthUi(isLoggedIn, message = "") {
-      $("counterGate").style.display = isLoggedIn ? "none" : "block";
-      $("counterContent").style.display = isLoggedIn ? "block" : "none";
-      $("callingControlsCard").style.display = isLoggedIn ? "block" : "none";
-      $("quickStatsCard").style.display = isLoggedIn ? "block" : "none";
-      $("kitchenGate").style.display = isLoggedIn ? "none" : "block";
-      $("kitchenContent").style.display = isLoggedIn ? "grid" : "none";
-      $("manageGate").style.display = isLoggedIn ? "none" : "block";
-      $("manageContent").style.display = isLoggedIn ? "block" : "none";
-      $("loginStateText").textContent = isLoggedIn ? "已登入" : "尚未登入";
-      $("loginMessage").textContent = message;
-      $("logoutBtn").style.display = isLoggedIn ? "inline-flex" : "none";
-      tabs.forEach((tab) => {
-        if (tab.dataset.view !== "displayView") {
-          tab.style.opacity = isLoggedIn ? "1" : "0.8";
-        }
-      });
-    }
-
-    function logout(message = "已登出") {
-      state.token = "";
-      setAuthUi(false, message);
-      renderAdmin();
-    }
-
-    async function request(path, options = {}) {
-      const response = await fetch(api(path), options);
-      const data = await response.json().catch(() => ({}));
-      if (response.status === 401) {
-        logout("登入已失效，請重新輸入櫃台密碼");
-      }
-      if (!response.ok) {
-        throw new Error(data.message || "操作失敗");
-      }
-      return data;
-    }
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => switchView(tab.dataset.view));
-    });
-
-    function renderPublic() {
-      $("currentPickupDisplay").textContent = publicState.currentPickupNumber || "--";
-      $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 組`;
-      const wrap = $("waitingList");
-      wrap.innerHTML = "";
-      if (!publicState.waitingPickupNumbers.length) {
-        wrap.innerHTML = '<div class="empty">目前沒有等待中的號碼</div>';
-        return;
-      }
-
-      publicState.waitingPickupNumbers.forEach((number) => {
-        const chip = document.createElement("div");
-        chip.className = "chip";
-        chip.textContent = number;
-        wrap.appendChild(chip);
-      });
-    }
-
-    function renderCalledHistory() {
-      const wrap = $("calledHistory");
-      const history = state.calling.calledPickupNumbers || [];
-      wrap.innerHTML = "";
-
-      if (!history.length) {
-        wrap.innerHTML = '<div class="empty">目前還沒有叫號紀錄</div>';
-        return;
-      }
-
-      history.forEach((number) => {
-        const chip = document.createElement("div");
-        chip.className = "chip";
-        chip.textContent = number;
-        wrap.appendChild(chip);
-      });
-    }
-
-    function renderProducts() {
-      const drinkWrap = $("drinkProducts");
-      const iceWrap = $("iceProducts");
-      drinkWrap.innerHTML = "";
-      iceWrap.innerHTML = "";
-
-      state.products.forEach((product) => {
-        const qty = cart.get(product.id) || 0;
-        const card = document.createElement("div");
-        card.className = "item";
-        card.innerHTML = `<div><strong>${product.name}</strong><div class="muted">${money(product.price)}</div></div><div class="qty"><button type="button" data-op="minus">-</button><span>${qty}</span><button type="button" data-op="plus">+</button></div>`;
-
-        card.querySelectorAll("button").forEach((button) => {
-          button.addEventListener("click", () => {
-            const next = (cart.get(product.id) || 0) + (button.dataset.op === "plus" ? 1 : -1);
-            if (next <= 0) {
-              cart.delete(product.id);
-            } else {
-              cart.set(product.id, next);
-            }
-            renderProducts();
-            renderSummary();
-          });
-        });
-
-        (product.category === "drink" ? drinkWrap : iceWrap).appendChild(card);
-      });
-    }
-
-    function renderSummary() {
-      const wrap = $("orderSummary");
-      const items = state.products
-        .filter((product) => cart.has(product.id))
-        .map((product) => ({ ...product, quantity: cart.get(product.id) }));
-
-      $("summaryCount").textContent = `${items.length} 項`;
-      wrap.innerHTML = "";
-
-      if (!items.length) {
-        wrap.innerHTML = '<div class="empty">尚未加入任何商品</div>';
-        $("totalAmount").textContent = "$0";
-        return;
-      }
-
-      let total = 0;
-      items.forEach((item) => {
-        const subtotal = item.price * item.quantity;
-        total += subtotal;
-        const row = document.createElement("div");
-        row.className = "summaryRow";
-        row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">${item.category === "drink" ? "飲料" : "冰品"}</div></div><div>x ${item.quantity}</div><div>${money(subtotal)}</div>`;
-        wrap.appendChild(row);
-      });
-
-      $("totalAmount").textContent = money(total);
-    }
-
-    function statusText(status) {
-      return {
-        pending: "待製作",
-        preparing: "製作中",
-        done: "已完成",
-        cancelled: "已取消"
-      }[status] || status;
-    }
-
-    function buildKitchenCard(order, category) {
-      const items = order.items.filter((item) => item.category === category);
-      if (!items.length || order.status === "done" || order.status === "cancelled") {
-        return null;
-      }
-
-      const card = document.createElement("div");
-      card.className = "orderCard";
-      card.innerHTML = `
-        <div class="orderHead">
-          <div>
-            <div class="orderId">${order.pickupNumber || order.orderId}</div>
-            <div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div>
-          </div>
-        </div>
-        <div class="tags">
-          <span class="tag">${statusText(order.status)}</span>
-          <span class="tag">${money(order.totalAmount)}</span>
-          <span class="tag">${order.pickupNumber ? "有叫號" : "無叫號"}</span>
-        </div>
-        <div class="stack">${items.map((item) => `<div class="item"><span>${item.name}</span><strong>x ${item.quantity}</strong></div>`).join("")}</div>
-        ${order.note ? `<div class="note">${order.note}</div>` : ""}
-      `;
-
-      if (state.token) {
-        const actions = document.createElement("div");
-        actions.className = "btns";
-        actions.style.marginTop = "10px";
-        actions.innerHTML = `<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">已完成</button>`;
-
-        actions.querySelectorAll("button").forEach((button) => {
-          button.addEventListener("click", async () => {
-            try {
-              await request(`/api/orders/${order.orderId}/status`, {
-                method: "PATCH",
-                headers: authHeaders(),
-                body: JSON.stringify({ status: button.dataset.status })
-              });
-              await refresh();
-            } catch (error) {
-              alert(error.message);
-            }
-          });
-        });
-
-        card.appendChild(actions);
-      }
-
-      return card;
-    }
-
-    function renderKitchen() {
-      const drinkWrap = $("drinkOrders");
-      const iceWrap = $("iceOrders");
-      drinkWrap.innerHTML = "";
-      iceWrap.innerHTML = "";
-      let drinkCount = 0;
-      let iceCount = 0;
-
-      state.orders
-        .filter((order) => order.status !== "done" && order.status !== "cancelled")
-        .forEach((order) => {
-          const drinkCard = buildKitchenCard(order, "drink");
-          const iceCard = buildKitchenCard(order, "ice");
-
-          if (drinkCard) {
-            drinkWrap.appendChild(drinkCard);
-            drinkCount += 1;
-          }
-          if (iceCard) {
-            iceWrap.appendChild(iceCard);
-            iceCount += 1;
-          }
-        });
-
-      if (!drinkCount) {
-        drinkWrap.innerHTML = '<div class="empty">目前沒有飲料訂單</div>';
-      }
-      if (!iceCount) {
-        iceWrap.innerHTML = '<div class="empty">目前沒有冰品訂單</div>';
-      }
-
-      $("drinkOrderCount").textContent = `${drinkCount} 單`;
-      $("iceOrderCount").textContent = `${iceCount} 單`;
-    }
-
-    function renderStats() {
-      $("counterCurrentPickup").textContent = state.calling.currentPickupNumber || "--";
-      $("counterWaitingCount").textContent = String(state.calling.waitingPickupNumbers.length);
-      $("quickRevenue").textContent = money(state.stats.totalRevenue);
-      $("quickOrders").textContent = String(state.stats.totalOrders);
-      $("statRevenue").textContent = money(state.stats.totalRevenue);
-      $("statOrders").textContent = String(state.stats.totalOrders);
-      $("statPending").textContent = String(state.stats.pendingOrders);
-      $("statPreparing").textContent = String(state.stats.preparingOrders);
-      renderCalledHistory();
-    }
-
-    function renderSales() {
-      const rows = state.stats.productSales || [];
-      $("salesTableWrap").innerHTML = rows.length
-        ? `<table><thead><tr><th>商品</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>`
-        : '<div class="empty">今天還沒有銷售紀錄</div>';
-    }
-
-    function renderOrders() {
-      $("ordersTableWrap").innerHTML = state.orders.length
-        ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map((order) => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map((item) => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" || !state.token ? '<span class="muted">--</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>`
-        : '<div class="empty">目前沒有訂單</div>';
-
-      document.querySelectorAll("[data-order-id]").forEach((button) => {
-        button.addEventListener("click", async () => {
-          if (!confirm("確定要取消這筆訂單嗎？")) {
-            return;
-          }
-          try {
-            await request(`/api/orders/${button.dataset.orderId}/cancel`, {
-              method: "POST",
-              headers: authHeaders()
-            });
-            await refresh();
-          } catch (error) {
-            alert(error.message);
-          }
-        });
-      });
-    }
-
-    function renderAdmin() {
-      renderProducts();
-      renderSummary();
-      renderStats();
-      renderKitchen();
-      renderSales();
-      renderOrders();
-    }
-
-    async function loadPublicState() {
-      const response = await fetch(api("/api/public-state"));
-      if (!response.ok) {
-        throw new Error("無法讀取叫號資訊");
-      }
-      Object.assign(publicState, await response.json());
-      renderPublic();
-    }
-
-    async function loadAdminState() {
-      if (!state.token) {
-        state.products = [];
-        state.orders = [];
-        state.calling = { currentPickupNumber: publicState.currentPickupNumber, waitingPickupNumbers: publicState.waitingPickupNumbers, calledPickupNumbers: [] };
-        state.stats = { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] };
-        renderAdmin();
-        return;
-      }
-
-      const data = await request("/api/admin-state", {
-        headers: { Authorization: `Bearer ${state.token}` }
-      });
-      state.products = data.products;
-      state.orders = data.orders;
-      state.calling = data.calling;
-      state.stats = data.stats;
-      setAuthUi(true, "登入成功，後台功能已開啟");
-      renderAdmin();
-    }
-
-    function setCallingMessage(message) {
-      $("callingMessage").textContent = message;
-    }
-
-    function setManageActionMessage(message) {
-      $("manageActionMessage").textContent = message;
-    }
-
-    async function refresh() {
-      try {
-        await loadPublicState();
-        await loadAdminState();
-        setConnection("連線正常", true);
-      } catch (error) {
-        setConnection(error.message, false);
-      }
-    }
-
-    $("loginBtn").addEventListener("click", async () => {
-      try {
-        const data = await request("/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: $("passwordInput").value })
-        });
-        state.token = data.token;
-        $("passwordInput").value = "";
-        await loadAdminState();
-      } catch (error) {
-        setAuthUi(false, error.message);
-      }
-    });
-
-    $("logoutBtn").addEventListener("click", () => logout("已登出櫃台"));
-
-    $("createOrderBtn").addEventListener("click", async () => {
-      const items = [...cart.entries()].map(([productId, quantity]) => ({ productId, quantity }));
-      if (!items.length) {
-        alert("請先加入商品");
-        return;
-      }
-
-      try {
-        await request("/api/orders", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({
-            items,
-            note: $("orderNote").value,
-            needsPickupNumber: $("needsPickupToggle").checked
-          })
-        });
-        cart.clear();
-        $("orderNote").value = "";
-        $("needsPickupToggle").checked = false;
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    $("clearOrderBtn").addEventListener("click", () => {
-      cart.clear();
-      $("orderNote").value = "";
-      $("needsPickupToggle").checked = false;
-      renderProducts();
-      renderSummary();
-    });
-
-    $("callNextBtn").addEventListener("click", async () => {
-      try {
-        const response = await request("/api/call-next", { method: "POST", headers: authHeaders() });
-        setCallingMessage(response.message);
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    $("recallCurrentBtn").addEventListener("click", async () => {
-      try {
-        const response = await request("/api/recall-current", { method: "POST", headers: authHeaders() });
-        setCallingMessage(response.message);
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    $("clearCurrentBtn").addEventListener("click", async () => {
-      try {
-        const response = await request("/api/clear-current-pickup", { method: "POST", headers: authHeaders() });
-        setCallingMessage(response.message);
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    $("resetCallingBtn").addEventListener("click", async () => {
-      try {
-        const response = await request("/api/reset-calling", { method: "POST", headers: authHeaders() });
-        setCallingMessage(response.message);
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    $("resetDailyBtn").addEventListener("click", async () => {
-      if (!confirm("確定要重設今日資料嗎？這會清空訂單、營收與叫號紀錄。")) {
-        return;
-      }
-
-      try {
-        const response = await request("/api/reset-daily", { method: "POST", headers: authHeaders() });
-        cart.clear();
-        $("orderNote").value = "";
-        $("needsPickupToggle").checked = false;
-        setCallingMessage("今日資料已重設。");
-        setManageActionMessage(response.message);
-        await refresh();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    async function init() {
-      setAuthUi(false, "請先登入櫃台密碼");
-      setCallingMessage("尚未操作叫號。");
-      setManageActionMessage("尚未執行管理操作。");
-      renderSummary();
-      renderPublic();
-      await refresh();
-      setInterval(refresh, 5000);
-    }
-
-    init();
+    const DEMO_STATE={posts:[{id:"trash-001",title:"外星人深夜降落士林夜市，只為了學鐵板麵加蛋",author:"垃圾線民",category:"都市傳說",summary:"目擊者表示，飛碟停在捷運站上空三分鐘，最後只帶走黑胡椒醬。",content:"昨天凌晨兩點，士林夜市上空出現不明強光。多名攤販指出，三名自稱來自『第八象限』的外星人走下飛碟後，沒有攻擊地球，只是反覆詢問鐵板麵能不能雙蛋。攤販最後以加麵不加價平息場面，現場一度被民眾誤認為新型排隊名店。",createdAt:"2026-03-28T12:20:00.000Z",featured:true,reactions:{fire:12,trash:2}},{id:"trash-002",title:"公司老闆請假三天，辦公椅暫代 CEO 並通過預算",author:"會議室觀察員",category:"荒謬職場",summary:"與會主管一致認為那張椅子的領導氣場比真人穩定。",content:"一間新創公司本週召開季度預算會議時，執行長臨時缺席。由於投影機已開、咖啡已到，團隊決定讓他平常坐的黑色辦公椅擺在主位。令人震驚的是，整場會議進行得異常順利，三個部門的預算案全部在十分鐘內通過，還有人主張明年直接讓椅子升任董事長。",createdAt:"2026-03-29T04:10:00.000Z",featured:false,reactions:{fire:21,trash:4}},{id:"trash-003",title:"氣象局改用珍珠奶茶預測天氣，甜度越高降雨機率越大",author:"微糖特派",category:"假科學",summary:"研究團隊強調，半糖是低氣壓，正常糖是梅雨鋒面。",content:"最新民間研究指出，珍珠奶茶甜度與大氣含水量具有神祕同步性。研究人員把一整排飲料杯放在陽台觀測，發現正常糖當天幾乎都會下雨，無糖則容易吹東北季風。雖然學界尚未承認這套模型，但辦公室同事已決定取消氣象 App，直接以午餐飲料做決策。",createdAt:"2026-03-30T02:00:00.000Z",featured:false,reactions:{fire:35,trash:6}}]};
+    DEMO_STATE.featuredPost=DEMO_STATE.posts.find((post)=>post.featured)||DEMO_STATE.posts[0];
+    DEMO_STATE.stats={totalPosts:DEMO_STATE.posts.length,totalFire:DEMO_STATE.posts.reduce((sum,post)=>sum+post.reactions.fire,0),totalTrash:DEMO_STATE.posts.reduce((sum,post)=>sum+post.reactions.trash,0),categories:Object.entries(DEMO_STATE.posts.reduce((acc,post)=>{acc[post.category]=(acc[post.category]||0)+1;return acc;},{})).map(([name,count])=>({name,count}))};
+    const state={apiUrl:"",sourceMode:"demo",posts:[],filteredCategory:"全部",featuredPost:null,stats:DEMO_STATE.stats};
+    const els={totalPosts:document.getElementById("totalPosts"),totalFire:document.getElementById("totalFire"),totalTrash:document.getElementById("totalTrash"),apiStatusText:document.getElementById("apiStatusText"),apiModeText:document.getElementById("apiModeText"),apiUrlDisplay:document.getElementById("apiUrlDisplay"),featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn")};
+    function resolveApiUrl(){const params=new URLSearchParams(window.location.search);const queryApi=params.get("api");if(queryApi){localStorage.setItem("garbage-news-api",queryApi);return queryApi.replace(/\/$/,"");}const savedApi=localStorage.getItem("garbage-news-api");return savedApi?savedApi.replace(/\/$/,""):"";}
+    function setFlash(message,isError=false){els.flashMessage.textContent=message;els.flashMessage.style.color=isError?"#8e2703":"#285943";}
+    function formatDate(value){return new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(value));}
+    async function apiFetch(path,options={}){if(!state.apiUrl) throw new Error("尚未設定 API");const response=await fetch(`${state.apiUrl}${path}`,{headers:{"Content-Type":"application/json",...(options.headers||{})},...options});const data=await response.json().catch(()=>({}));if(!response.ok) throw new Error(data.message||"API 請求失敗");return data;}
+    function applyData(payload,mode){state.sourceMode=mode;state.posts=payload.posts||[];state.featuredPost=payload.featuredPost||state.posts[0]||null;state.stats=payload.stats||{totalPosts:0,totalFire:0,totalTrash:0,categories:[]};render();}
+    async function loadPosts(){els.apiStatusText.textContent="載入中";try{if(!state.apiUrl){applyData(DEMO_STATE,"demo");els.apiStatusText.textContent="展示模式";return;}const payload=await apiFetch("/api/posts");applyData(payload,"live");els.apiStatusText.textContent="已連線";}catch(error){applyData(DEMO_STATE,"demo");els.apiStatusText.textContent="連線失敗";setFlash(`API 無法連線，已切換展示模式：${error.message}`,true);}}
+    function renderHeadline(){const post=state.featuredPost;if(!post){els.featuredTitle.textContent="目前沒有頭條";els.featuredSummary.textContent="請先發表第一篇垃圾新聞。";els.featuredContent.textContent="";return;}els.featuredTitle.classList.remove("loading");els.featuredTitle.textContent=post.title;els.featuredSummary.textContent=post.summary||post.content.slice(0,100);els.featuredContent.textContent=post.content;els.featuredCategory.textContent=`分類 ${post.category}`;els.featuredAuthor.textContent=`作者 ${post.author||"匿名垃圾人"}`;els.featuredDate.textContent=formatDate(post.createdAt);}
+    function renderStats(){els.totalPosts.textContent=state.stats.totalPosts||0;els.totalFire.textContent=state.stats.totalFire||0;els.totalTrash.textContent=state.stats.totalTrash||0;els.apiModeText.textContent=state.sourceMode==="live"?"Cloudflare / 自架 API":"內建展示資料";els.apiUrlDisplay.textContent=state.apiUrl||"demo mode";}
+    function renderFilters(){const categories=["全部",...(state.stats.categories||[]).map((item)=>item.name)];els.categoryFilters.innerHTML=categories.map((category)=>`<button class="tag-filter ${state.filteredCategory===category?"active":""}" data-category="${category}">${category}</button>`).join("");els.categoryFilters.querySelectorAll("[data-category]").forEach((button)=>{button.addEventListener("click",()=>{state.filteredCategory=button.dataset.category;renderFeed();renderFilters();});});}
+    function filteredPosts(){return state.filteredCategory==="全部"?state.posts:state.posts.filter((post)=>post.category===state.filteredCategory);}
+    function renderFeed(){const posts=filteredPosts();if(!posts.length){els.postFeed.innerHTML='<div class="card empty">這個分類目前沒有垃圾新聞。</div>';return;}els.postFeed.innerHTML=posts.map((post)=>`<article class="card story"><div class="story-top"><div><div class="badge">${post.category}</div><h3>${post.title}</h3></div><div class="pill">${formatDate(post.createdAt)}</div></div><p class="story-summary">${post.summary||post.content.slice(0,90)}</p><p>${post.content}</p><div class="story-actions"><div class="reaction-group"><button class="reaction-btn" data-reaction="fire" data-id="${post.id}">火熱 ${post.reactions?.fire||0}</button><button class="reaction-btn" data-reaction="trash" data-id="${post.id}">垃圾 ${post.reactions?.trash||0}</button></div><div>作者 ${post.author||"匿名垃圾人"}</div></div></article>`).join("");els.postFeed.querySelectorAll("[data-reaction]").forEach((button)=>{button.addEventListener("click",()=>reactToPost(button.dataset.id,button.dataset.reaction));});}
+    function render(){renderHeadline();renderStats();renderFilters();renderFeed();}
+    async function reactToPost(postId,type){try{if(state.sourceMode!=="live"){const post=state.posts.find((item)=>item.id===postId);if(post){post.reactions[type]+=1;state.stats.totalFire=state.posts.reduce((sum,item)=>sum+item.reactions.fire,0);state.stats.totalTrash=state.posts.reduce((sum,item)=>sum+item.reactions.trash,0);render();setFlash("展示模式已模擬投票，部署 API 後會真正寫入資料庫。");}return;}await apiFetch(`/api/posts/${postId}/reactions`,{method:"POST",body:JSON.stringify({type})});await loadPosts();setFlash("互動已送出。");}catch(error){setFlash(error.message,true);}}
+    async function handleSubmit(event){event.preventDefault();const formData=new FormData(els.postForm);const payload=Object.fromEntries(formData.entries());if(!payload.title?.trim()||!payload.content?.trim()){setFlash("標題與內文不能空白。",true);return;}if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先部署並設定 API 才能真正發文。",true);return;}els.submitBtn.disabled=true;try{await apiFetch("/api/posts",{method:"POST",body:JSON.stringify(payload)});els.postForm.reset();setFlash("文章已發佈。");await loadPosts();}catch(error){setFlash(error.message,true);}finally{els.submitBtn.disabled=false;}}
+    els.postForm.addEventListener("submit",handleSubmit);els.refreshBtn.addEventListener("click",()=>{setFlash("重新抓取文章列表。");loadPosts();});state.apiUrl=resolveApiUrl();loadPosts();
   </script>
 </body>
 </html>

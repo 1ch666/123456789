@@ -1,116 +1,72 @@
-# 免費部署流程
+# 免費部署說明
 
-這份流程會把系統拆成兩部分：
+這個專案目前拆成兩部分：
 
-- 前端：GitHub Pages
-- 後端 API：Cloudflare Workers
+- 前端：`index.html`，可直接放在 GitHub Pages
+- 後端：`cloudflare-worker/`，可免費部署到 Cloudflare Workers + Durable Objects
 
-完成後，手機和平板只要打開 GitHub Pages 網址，就能使用同一套系統。
+## 1. 部署前端到 GitHub Pages
 
-## 1. 前端上線到 GitHub Pages
+把根目錄的 `index.html` push 到 GitHub 後，在 repo 的 `Settings -> Pages` 設定：
 
-你的前端首頁已經是根目錄的 `index.html`，GitHub Pages 可以直接發布。
+1. `Source` 選 `Deploy from a branch`
+2. `Branch` 選你的主分支
+3. Folder 選 `/ (root)`
 
-### 設定步驟
+存檔後，GitHub Pages 會自動發布。
 
-1. 打開你的 repo：
-   `https://github.com/1ch666/123456789`
-2. 進入 `Settings`
-3. 點左邊 `Pages`
-4. `Build and deployment`
-5. `Source` 選 `Deploy from a branch`
-6. `Branch` 選 `main`
-7. Folder 選 `/ (root)`
-8. 按 `Save`
+## 2. 部署免費 API 到 Cloudflare Workers
 
-### 成功後網址
-
-GitHub Pages 網址通常會是：
-
-`https://1ch666.github.io/123456789/`
-
-## 2. 後端上線到 Cloudflare Workers
-
-後端部署目錄是：
-
-`C:\Users\user\Desktop\網站\cloudflare-worker`
-
-### 第一次部署
-
-開 PowerShell：
+進入 Worker 目錄：
 
 ```powershell
 cd C:\Users\user\Desktop\網站\cloudflare-worker
 npm install
 npx wrangler login
-npx wrangler secret put ADMIN_PASSWORD
-npm run deploy
 ```
 
-### 你會需要輸入的東西
-
-- `ADMIN_PASSWORD`
-  這裡輸入你真正要給櫃台用的密碼
-
-### 部署成功後
-
-Cloudflare 會給你一個網址，格式通常像：
-
-`https://counter-api.<你的-subdomain>.workers.dev`
-
-## 3. 把前端綁到正式 API
-
-前端支援用網址參數設定 API，設定一次後會記在瀏覽器。
-
-第一次打開前端時，請用這種格式：
-
-```text
-https://1ch666.github.io/123456789/?api=https://counter-api.<你的-subdomain>.workers.dev
-```
-
-這樣這台手機或平板之後就會記住正式 API。
-
-## 4. 給手機和平板使用
-
-部署完成後，你可以把這個網址傳給手機和平板：
-
-```text
-https://1ch666.github.io/123456789/?api=https://counter-api.<你的-subdomain>.workers.dev
-```
-
-建議：
-
-- 櫃台平板：先登入後固定開著櫃台頁
-- 製作區平板：先登入後切到製作頁
-- 客人顯示器：只開顯示頁，不登入
-
-## 5. 之後更新程式
-
-每次你修改完程式並 push 到 GitHub 之後：
-
-- GitHub Pages 會自動更新前端
-
-如果你有改 `cloudflare-worker/` 裡面的 API，還要再部署一次 Workers：
+可選設定：
 
 ```powershell
-cd C:\Users\user\Desktop\網站\cloudflare-worker
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put CORS_ORIGIN
+```
+
+正式部署：
+
+```powershell
 npm run deploy
 ```
 
-## 6. 建議的正式設定
+部署成功後，會得到類似：
 
-部署穩定後，建議把 Worker 的 `CORS_ORIGIN` 改成你的 GitHub Pages 網址，而不是 `*`。
+`https://garbage-news-api.<你的-subdomain>.workers.dev`
 
-你可以在 `cloudflare-worker/wrangler.jsonc` 裡把：
+## 3. 讓前端接上 API
 
-```json
-"CORS_ORIGIN": "*"
+第一次打開網站時，在網址後面加上：
+
+```text
+?api=https://garbage-news-api.<你的-subdomain>.workers.dev
 ```
 
-改成：
+前端會把這個 API 網址存進 `localStorage`，之後同一台裝置不需要再加。
 
-```json
-"CORS_ORIGIN": "https://1ch666.github.io"
+## 4. 本地開發
+
+```powershell
+cd C:\Users\user\Desktop\網站
+node .\server\server.js
 ```
 
-如果之後你要，我可以再幫你把這個限制直接改好。
+然後打開：
+
+```text
+http://localhost:3000/?api=http://localhost:3000
+```
+
+## 5. 資料說明
+
+- Cloudflare Worker 版會把文章存到 Durable Object
+- 本地 Express 版會把文章存到 `server/data/posts.json`
+- 若 API 尚未設定，前端會退回展示模式並顯示內建示範文章

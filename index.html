@@ -1,119 +1,793 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>超級垃圾新聞網</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:opsz@40&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <title>飲料冰品店點餐系統</title>
   <style>
-    :root{--bg:#efe4d6;--paper:#fffaf4;--ink:#181511;--muted:#6d6258;--line:rgba(24,21,17,.12);--accent:#bf4514;--accent-dark:#892803;--shadow:0 18px 42px rgba(37,24,13,.08)}
-    *{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink);background:radial-gradient(circle at 0 0,rgba(191,69,20,.14),transparent 24%),linear-gradient(180deg,#efe4d6 0%,#f8f2ea 45%,#efe5d7 100%)}
-    .shell{max-width:1320px;margin:0 auto;padding:24px 18px 52px}.masthead,.hero-grid,.layout{display:grid;gap:18px}.masthead,.hero-grid,.layout{grid-template-columns:1fr 1fr}
-    .brand,.card{background:rgba(255,250,244,.94);border:1px solid var(--line);border-radius:32px;box-shadow:var(--shadow)} .brand{padding:32px;position:relative;overflow:hidden}
-    .brand:after{content:"垃圾速報";position:absolute;top:20px;right:-36px;transform:rotate(20deg);padding:10px 40px;background:var(--accent);color:#fff;font-weight:900;letter-spacing:.18em}
-    .eyebrow,.panel-label{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent-dark);font-weight:900}
-    h1,h2,h3{margin:0;font-family:"DM Serif Display","Noto Serif TC",serif;font-weight:400;line-height:1} h1{font-size:clamp(46px,8vw,92px);margin-top:8px}
-    .card{padding:22px}.headline{display:grid;gap:16px;min-height:420px}.headline-title{font-size:clamp(32px,5vw,64px);line-height:1.02}.headline-summary{margin:0;color:var(--muted);line-height:1.8;font-size:18px}
-    .headline-content{line-height:1.9;border-top:1px solid var(--line);padding-top:16px;color:#352d27}.headline-footer,.story-actions,.toolbar,.btn-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-    .headline-footer{color:var(--muted);font-size:14px}.badge,.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px}.badge{background:rgba(191,69,20,.1);color:var(--accent-dark);font-size:13px;font-weight:900}.pill{border:1px solid var(--line);background:#fff}
-    .toolbar{margin:22px 0}.toolbar-left{display:flex;flex-wrap:wrap;gap:10px}.tag-filter,.btn,.reaction-btn{font:inherit;cursor:pointer;transition:.18s ease}.tag-filter{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:800}
-    .tag-filter.active,.tag-filter:hover{background:var(--ink);color:#fff;border-color:var(--ink)}.feed{display:grid;gap:16px}.story{display:grid;gap:14px}.story h3{font-size:30px;line-height:1.08}.story p{margin:0;line-height:1.85}.story-summary{color:var(--muted)}
-    .story-actions{justify-content:space-between;border-top:1px solid var(--line);padding-top:14px}.reaction-group{display:flex;flex-wrap:wrap;gap:10px}.reaction-btn,.btn{padding:11px 15px;border-radius:16px;border:1px solid var(--line);background:#fff}.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;border:0;font-weight:900}
-    .panel-stack,.composer,.admin-panel,.field,.list{display:grid;gap:14px}.composer,.admin-panel{position:sticky;top:20px}.field label{font-size:13px;color:var(--accent-dark);font-weight:900;letter-spacing:.08em}
-    input,textarea{width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit} textarea{min-height:120px;resize:vertical}
-    .help,.flash,.admin-status{padding:12px 14px;border-radius:18px;font-size:14px;line-height:1.7}.help{border:1px dashed var(--line);background:rgba(255,248,238,.9);color:var(--muted)}.flash,.admin-status{background:#fff;border:1px solid var(--line)}
-    .empty{text-align:center;padding:28px 22px;color:var(--muted)} .hidden{display:none !important} .admin-item{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff}.footer{margin-top:26px;text-align:center;color:var(--muted);font-size:14px}
-    @media (max-width:1080px){.masthead,.hero-grid,.layout{grid-template-columns:1fr}.composer,.admin-panel{position:static}}
+    :root{
+      --bg:#f7f1e8;
+      --card:#fffaf2;
+      --ink:#2b241e;
+      --muted:#6f655d;
+      --line:#e6d8c6;
+      --accent:#b85c16;
+      --accent-2:#7c3f10;
+      --drink:#155e75;
+      --ice:#0f766e;
+      --danger:#b42318;
+      --ok:#166534;
+      --shadow:0 12px 26px rgba(74,45,14,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(180deg,#fbf5eb,#efe1cb);color:var(--ink)}
+    .app{max-width:1440px;margin:0 auto;padding:24px}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+    .title h1{margin:0;font-size:32px}
+    .title p{margin:8px 0 0;color:var(--muted)}
+    .pill{padding:10px 14px;border-radius:999px;background:#fff7ec;border:1px solid var(--line);color:var(--muted)}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+    .tab{border:0;border-radius:999px;padding:12px 18px;background:#fff7eb;color:var(--ink);cursor:pointer;font:inherit;font-weight:700}
+    .tab.active{background:var(--accent);color:#fff}
+    .view{display:none}
+    .view.active{display:block}
+    .grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{display:grid;gap:16px}
+    .grid-hero{grid-template-columns:1.1fr 1fr}
+    .grid-counter{grid-template-columns:1.15fr .95fr}
+    .grid-board,.grid-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{background:rgba(255,250,242,.95);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+    .section{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .section h2,.section h3{margin:0}
+    .muted{font-size:14px;color:var(--muted)}
+    .displayHero{min-height:260px;display:grid;place-items:center;text-align:center}
+    .big{font-size:clamp(72px,14vw,150px);font-weight:900;letter-spacing:.08em;color:var(--accent)}
+    .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+    .chip{min-height:80px;border-radius:18px;border:1px solid var(--line);display:grid;place-items:center;background:#fff;font-weight:900;font-size:28px}
+    .empty{padding:20px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted);background:#fffaf6}
+    .list,.stack{display:grid;gap:12px}
+    .group{padding:16px;border-radius:20px;border:1px solid var(--line);background:#fffdf9}
+    .item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:34px;height:34px;border:0;border-radius:10px;background:#f3e7d3;cursor:pointer;font-weight:900}
+    .qty span{min-width:30px;text-align:center;font-weight:800}
+    .summaryRow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .toggle{appearance:none;position:relative;width:58px;height:32px;border-radius:999px;background:#d7c7b2;cursor:pointer}
+    .toggle:checked{background:var(--accent)}
+    .toggle:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+    .toggle:checked:after{transform:translateX(26px)}
+    input,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit}
+    textarea{min-height:88px;resize:vertical}
+    .btns{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit;font-weight:700}
+    .primary{background:var(--accent);color:#fff}
+    .secondary{background:#fff;border:1px solid var(--line)}
+    .drink{background:rgba(21,94,117,.12);color:var(--drink)}
+    .ice{background:rgba(15,118,110,.12);color:var(--ice)}
+    .ok{background:rgba(22,101,52,.12);color:var(--ok)}
+    .danger{background:rgba(180,35,24,.12);color:var(--danger)}
+    .metric{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+    .metric strong{display:block;font-size:30px;margin-top:8px}
+    .notice{padding:16px;border:1px dashed var(--line);border-radius:16px;background:#fff7eb;color:var(--muted)}
+    .dangerPanel{padding:18px;border:1px solid rgba(180,35,24,.22);border-radius:20px;background:linear-gradient(180deg,rgba(180,35,24,.08),rgba(180,35,24,.02))}
+    .dangerPanel strong{color:var(--danger)}
+    .dangerButton{background:linear-gradient(180deg,#cf3b2d,#a61f15);color:#fff;box-shadow:0 10px 22px rgba(180,35,24,.22)}
+    .dangerButton:hover{filter:brightness(1.03)}
+    .actionText{font-size:14px;color:var(--muted)}
+    .orderCard{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
+    .orderHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .orderId{font-size:24px;font-weight:900}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .tag{padding:5px 10px;border-radius:999px;background:#f3e7d3;font-size:12px}
+    .note{margin-top:10px;padding:10px;border-radius:12px;background:#f8eedf;color:var(--muted);font-size:14px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);font-weight:700}
+    @media (max-width:1100px){.grid-hero,.grid-counter,.grid-board,.grid-two,.grid-four{grid-template-columns:1fr}}
+    @media (max-width:720px){.top{flex-direction:column}.summaryRow{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <main class="shell">
-    <section class="masthead">
-      <section class="brand">
-        <div class="eyebrow">Independent nonsense press</div>
-        <h1>超級垃圾新聞網</h1>
-      </section>
-      <section class="card">
-        <div class="panel-label">Admin</div>
-        <h2 style="margin-top:10px;font-size:38px">管理員介面</h2>
-        <div class="help">登入後可編輯文章、設為頭條、清空文章。</div>
-      </section>
-    </section>
+  <div class="app">
+    <div class="top">
+      <div class="title">
+        <h1>飲料冰品店點餐系統</h1>
+      </div>
+      <div class="pill" id="connectionStatus">連線中...</div>
+    </div>
 
-    <section class="hero-grid">
-      <article class="card headline">
-        <div>
-          <div class="badge">頭條新聞</div>
-          <h2 class="headline-title" id="featuredTitle">目前沒有頭條</h2>
-          <p class="headline-summary" id="featuredSummary">請先發表第一篇新聞。</p>
-        </div>
-        <div class="headline-content" id="featuredContent"></div>
-        <div class="headline-footer">
-          <span class="pill" id="featuredCategory">分類 --</span>
-          <span id="featuredAuthor">作者 --</span>
-          <span id="featuredDate">時間 --</span>
-        </div>
-      </article>
+    <div class="tabs">
+      <button class="tab active" data-view="displayView">顯示頁</button>
+      <button class="tab" data-view="counterView">櫃台頁</button>
+      <button class="tab" data-view="kitchenView">製作頁</button>
+      <button class="tab" data-view="manageView">管理頁</button>
+    </div>
 
-      <section class="panel-stack">
-        <section class="card composer">
-          <div><div class="panel-label">Publish</div><h2 style="margin-top:10px;font-size:38px">發表文章</h2></div>
-          <form id="postForm" class="list">
-            <div class="field"><label for="titleInput">標題</label><input id="titleInput" name="title" maxlength="80" required /></div>
-            <div class="field"><label for="authorInput">作者</label><input id="authorInput" name="author" maxlength="24" placeholder="匿名垃圾人" /></div>
-            <div class="field"><label for="categoryInput">分類</label><input id="categoryInput" name="category" maxlength="20" /></div>
-            <div class="field"><label for="summaryInput">摘要</label><input id="summaryInput" name="summary" maxlength="140" /></div>
-            <div class="field"><label for="contentInput">內文</label><textarea id="contentInput" name="content" maxlength="4000" required></textarea></div>
-            <div class="btn-row"><button class="btn primary" type="submit" id="submitBtn">送出</button><button class="btn" type="button" id="refreshBtn">重新整理</button></div>
-            <div class="flash" id="flashMessage"></div>
-          </form>
-        </section>
-
-        <section class="card admin-panel">
-          <div class="field"><label for="adminPasswordInput">管理員密碼</label><input id="adminPasswordInput" type="password" placeholder="輸入密碼" /></div>
-          <div class="btn-row"><button class="btn primary" type="button" id="adminLoginBtn">登入</button><button class="btn hidden" type="button" id="adminLogoutBtn">登出</button></div>
-          <div class="admin-status" id="adminStatus">尚未登入</div>
-          <div id="adminControls" class="hidden">
-            <div class="btn-row" style="margin-bottom:10px"><button class="btn" type="button" id="clearPostsBtn">清空文章</button></div>
-            <div class="list" id="adminPostList"></div>
+    <section class="view active" id="displayView">
+      <div class="grid-hero">
+        <div class="card displayHero">
+          <div>
+            <div class="muted">目前叫號</div>
+            <div class="big" id="currentPickupDisplay">--</div>
           </div>
-        </section>
-      </section>
+        </div>
+        <div class="card">
+          <div class="section">
+            <h2>等待中的號碼</h2>
+            <span class="muted" id="waitingCount">0 組</span>
+          </div>
+          <div class="chips" id="waitingList"></div>
+        </div>
+      </div>
     </section>
 
-    <section class="toolbar"><div class="toolbar-left" id="categoryFilters"></div></section>
-    <section class="layout"><section class="feed" id="postFeed"></section></section>
-    <div class="footer">© 2026 LightNews Trash Edition.</div>
-  </main>
+    <section class="view" id="counterView">
+      <div class="grid-counter">
+        <div class="card">
+          <div class="section">
+            <h2>櫃台點餐</h2>
+            <span class="muted">登入後即可建立訂單、叫號與查看即時統計。</span>
+          </div>
+          <div id="counterGate" class="notice">請先在右側輸入櫃台密碼登入。</div>
+          <div id="counterContent" style="display:none">
+            <div class="grid-two">
+              <div class="group">
+                <div class="section">
+                  <h3>飲料區</h3>
+                  <span class="muted">點一下加減數量</span>
+                </div>
+                <div class="list" id="drinkProducts"></div>
+              </div>
+              <div class="group">
+                <div class="section">
+                  <h3>冰品區</h3>
+                  <span class="muted">支援混合訂單</span>
+                </div>
+                <div class="list" id="iceProducts"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:16px;padding:16px">
+              <div class="section">
+                <h3>訂單明細</h3>
+                <span class="muted" id="summaryCount">0 項</span>
+              </div>
+              <div class="stack" id="orderSummary"></div>
+              <div class="switch" style="margin-top:14px">
+                <div>
+                  <strong>需要取餐號</strong>
+                  <div class="muted">開啟後會自動產生 A001 形式號碼</div>
+                </div>
+                <input type="checkbox" class="toggle" id="needsPickupToggle" />
+              </div>
+              <div style="margin-top:14px">
+                <label for="orderNote">備註</label>
+                <textarea id="orderNote" placeholder="例如：少冰、不要煉乳、分開裝"></textarea>
+              </div>
+              <div class="card" style="margin-top:14px;padding:16px;background:#fde8c4">
+                訂單總價
+                <strong id="totalAmount" style="display:block;font-size:38px;margin-top:6px">$0</strong>
+              </div>
+              <div class="btns" style="margin-top:14px">
+                <button class="btn primary" id="createOrderBtn">建立訂單</button>
+                <button class="btn secondary" id="clearOrderBtn">清空內容</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <div class="section">
+              <h2>櫃台登入</h2>
+              <span class="muted" id="loginStateText">尚未登入</span>
+            </div>
+            <div class="stack">
+              <input id="passwordInput" type="password" placeholder="輸入櫃台密碼" />
+              <div class="btns">
+                <button class="btn primary" id="loginBtn">登入櫃台</button>
+                <button class="btn secondary" id="logoutBtn" style="display:none">登出</button>
+              </div>
+              <div class="muted" id="loginMessage"></div>
+            </div>
+          </div>
+          <div class="card" id="callingControlsCard" style="display:none">
+            <div class="section">
+              <h2>叫號控制</h2>
+              <span class="muted">只會叫到有取餐號的訂單</span>
+            </div>
+            <div class="grid-two">
+              <div class="metric"><span class="muted">目前叫號</span><strong id="counterCurrentPickup">--</strong></div>
+              <div class="metric"><span class="muted">等待數量</span><strong id="counterWaitingCount">0</strong></div>
+            </div>
+            <div class="btns" style="margin-top:14px">
+              <button class="btn primary" id="callNextBtn">叫下一號</button>
+              <button class="btn secondary" id="recallCurrentBtn">重叫目前號碼</button>
+              <button class="btn ice" id="clearCurrentBtn">清除目前號碼</button>
+              <button class="btn danger" id="resetCallingBtn">重設叫號</button>
+            </div>
+            <div class="notice" style="margin-top:14px">
+              <strong>叫號狀態</strong>
+              <div id="callingMessage" class="muted" style="margin-top:8px">尚未操作叫號。</div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="section">
+                <h3>最近叫號</h3>
+                <span class="muted">保留最近 10 筆</span>
+              </div>
+              <div class="chips" id="calledHistory"></div>
+            </div>
+          </div>
+          <div class="card" id="quickStatsCard" style="display:none">
+            <div class="section">
+              <h2>今日快速統計</h2>
+              <span class="muted">櫃台可即時查看</span>
+            </div>
+            <div class="grid-two">
+              <div class="metric"><span class="muted">今日營收</span><strong id="quickRevenue">$0</strong></div>
+              <div class="metric"><span class="muted">今日訂單</span><strong id="quickOrders">0</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="kitchenView">
+      <div class="card">
+        <div class="section">
+          <h2>製作看板</h2>
+          <span class="muted">飲料和冰品分區顯示，同一筆混合訂單會同步出現。</span>
+        </div>
+        <div id="kitchenGate" class="notice">登入後可操作製作狀態。</div>
+        <div id="kitchenContent" class="grid-board" style="display:none">
+          <div class="card">
+            <div class="section">
+              <h3>飲料區</h3>
+              <span class="muted" id="drinkOrderCount">0 單</span>
+            </div>
+            <div class="stack" id="drinkOrders"></div>
+          </div>
+          <div class="card">
+            <div class="section">
+              <h3>冰品區</h3>
+              <span class="muted" id="iceOrderCount">0 單</span>
+            </div>
+            <div class="stack" id="iceOrders"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="manageView">
+      <div class="card">
+        <div class="section">
+          <h2>管理統計</h2>
+          <span class="muted">今日營收、各商品銷量、訂單狀態總覽。</span>
+        </div>
+        <div id="manageGate" class="notice">登入後可查看管理資料。</div>
+        <div id="manageContent" style="display:none">
+          <div class="dangerPanel" style="margin-bottom:16px">
+            <div class="section">
+              <h3>管理操作</h3>
+              <span class="muted">重設會清空今日訂單、營收與叫號資料</span>
+            </div>
+            <div class="btns">
+              <button class="btn dangerButton" id="resetDailyBtn">重設今日資料</button>
+            </div>
+            <div class="actionText" id="manageActionMessage" style="margin-top:12px">尚未執行管理操作。</div>
+          </div>
+          <div class="grid-four">
+            <div class="metric"><span class="muted">今日營收</span><strong id="statRevenue">$0</strong></div>
+            <div class="metric"><span class="muted">今日訂單</span><strong id="statOrders">0</strong></div>
+            <div class="metric"><span class="muted">待製作</span><strong id="statPending">0</strong></div>
+            <div class="metric"><span class="muted">製作中</span><strong id="statPreparing">0</strong></div>
+          </div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section">
+              <h3>商品銷售統計</h3>
+              <span class="muted">依售出數量排序</span>
+            </div>
+            <div id="salesTableWrap"></div>
+          </div>
+          <div class="card" style="margin-top:16px;padding:16px">
+            <div class="section">
+              <h3>今日訂單列表</h3>
+              <span class="muted">未完成訂單可直接取消</span>
+            </div>
+            <div id="ordersTableWrap"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <script>
-    const DEMO_STATE={posts:[],featuredPost:null,stats:{totalPosts:0,totalFire:0,totalTrash:0,categories:[]}};
-    const state={apiUrl:"",sourceMode:"demo",posts:[],filteredCategory:"全部",featuredPost:null,stats:DEMO_STATE.stats,adminPassword:localStorage.getItem("garbage-news-admin-password")||"",adminLoggedIn:false};
-    const els={featuredTitle:document.getElementById("featuredTitle"),featuredSummary:document.getElementById("featuredSummary"),featuredContent:document.getElementById("featuredContent"),featuredCategory:document.getElementById("featuredCategory"),featuredAuthor:document.getElementById("featuredAuthor"),featuredDate:document.getElementById("featuredDate"),categoryFilters:document.getElementById("categoryFilters"),postFeed:document.getElementById("postFeed"),postForm:document.getElementById("postForm"),flashMessage:document.getElementById("flashMessage"),submitBtn:document.getElementById("submitBtn"),refreshBtn:document.getElementById("refreshBtn"),adminPasswordInput:document.getElementById("adminPasswordInput"),adminLoginBtn:document.getElementById("adminLoginBtn"),adminLogoutBtn:document.getElementById("adminLogoutBtn"),adminStatus:document.getElementById("adminStatus"),adminControls:document.getElementById("adminControls"),adminPostList:document.getElementById("adminPostList"),clearPostsBtn:document.getElementById("clearPostsBtn")};
-    function resolveApiUrl(){const params=new URLSearchParams(window.location.search);const queryApi=params.get("api");if(queryApi){localStorage.setItem("garbage-news-api",queryApi);return queryApi.replace(/\/$/,"");}const savedApi=localStorage.getItem("garbage-news-api");return savedApi?savedApi.replace(/\/$/,""):"";}
-    function setFlash(message,isError=false){els.flashMessage.textContent=message;els.flashMessage.style.color=isError?"#8e2703":"#285943";}
-    function setAdminStatus(message,isError=false){els.adminStatus.textContent=message;els.adminStatus.style.color=isError?"#8e2703":"#285943";}
-    function formatDate(value){return new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(value));}
-    async function apiFetch(path,options={}){if(!state.apiUrl) throw new Error("尚未設定 API");const headers={"Content-Type":"application/json",...(options.headers||{})};if(state.adminPassword) headers["X-Admin-Password"]=state.adminPassword;const response=await fetch(`${state.apiUrl}${path}`,{...options,headers});const data=await response.json().catch(()=>({}));if(!response.ok) throw new Error(data.message||"API 請求失敗");return data;}
-    function applyData(payload,mode){state.sourceMode=mode;state.posts=payload.posts||[];state.featuredPost=payload.featuredPost||state.posts[0]||null;state.stats=payload.stats||{totalPosts:0,totalFire:0,totalTrash:0,categories:[]};render();}
-    async function loadPosts(){try{if(!state.apiUrl){applyData(DEMO_STATE,"demo");return;}const payload=await apiFetch("/api/posts");applyData(payload,"live");}catch(error){applyData(DEMO_STATE,"demo");setFlash(`API 無法連線，已切換展示模式：${error.message}`,true);}}
-    function renderHeadline(){const post=state.featuredPost;if(!post){els.featuredTitle.textContent="目前沒有頭條";els.featuredSummary.textContent="請先發表第一篇新聞。";els.featuredContent.textContent="";els.featuredCategory.textContent="分類 --";els.featuredAuthor.textContent="作者 --";els.featuredDate.textContent="時間 --";return;}els.featuredTitle.textContent=post.title;els.featuredSummary.textContent=post.summary||post.content.slice(0,100);els.featuredContent.textContent=post.content;els.featuredCategory.textContent=`分類 ${post.category||"未分類"}`;els.featuredAuthor.textContent=`作者 ${post.author||"匿名垃圾人"}`;els.featuredDate.textContent=formatDate(post.createdAt);}
-    function renderFilters(){const categories=["全部",...(state.stats.categories||[]).map((item)=>item.name)];els.categoryFilters.innerHTML=categories.map((category)=>`<button class="tag-filter ${state.filteredCategory===category?"active":""}" data-category="${category}">${category}</button>`).join("");els.categoryFilters.querySelectorAll("[data-category]").forEach((button)=>{button.addEventListener("click",()=>{state.filteredCategory=button.dataset.category;renderFeed();renderFilters();});});}
-    function filteredPosts(){return state.filteredCategory==="全部"?state.posts:state.posts.filter((post)=>post.category===state.filteredCategory);}
-    function renderFeed(){const posts=filteredPosts();if(!posts.length){els.postFeed.innerHTML='<div class="card empty">目前沒有文章。</div>';return;}els.postFeed.innerHTML=posts.map((post)=>`<article class="card story"><div><div class="badge">${post.category||"未分類"}</div><h3>${post.title}</h3></div><p class="story-summary">${post.summary||""}</p><p>${post.content}</p><div class="story-actions"><div class="reaction-group"><button class="reaction-btn" data-reaction="fire" data-id="${post.id}">火熱 ${post.reactions?.fire||0}</button><button class="reaction-btn" data-reaction="trash" data-id="${post.id}">垃圾 ${post.reactions?.trash||0}</button></div><div>${post.author||"匿名垃圾人"} · ${formatDate(post.createdAt)}</div></div></article>`).join("");els.postFeed.querySelectorAll("[data-reaction]").forEach((button)=>{button.addEventListener("click",()=>reactToPost(button.dataset.id,button.dataset.reaction));});}
-    function renderAdmin(){els.adminPasswordInput.value=state.adminPassword;els.adminControls.classList.toggle("hidden",!state.adminLoggedIn);els.adminLogoutBtn.classList.toggle("hidden",!state.adminLoggedIn);els.adminLoginBtn.classList.toggle("hidden",state.adminLoggedIn);if(!state.adminLoggedIn){els.adminPostList.innerHTML="";return;}if(!state.posts.length){els.adminPostList.innerHTML='<div class="admin-item">目前沒有文章可管理。</div>';return;}els.adminPostList.innerHTML=state.posts.map((post)=>`<div class="admin-item"><strong>${post.title}</strong><div style="margin:8px 0 12px;color:#6d6258">${post.category||"未分類"} · ${post.author||"匿名垃圾人"}</div><div class="btn-row"><button class="btn" data-edit="${post.id}">編輯</button><button class="btn" data-feature="${post.id}">設為頭條</button></div></div>`).join("");els.adminPostList.querySelectorAll("[data-edit]").forEach((button)=>button.addEventListener("click",()=>populateEditor(button.dataset.edit)));els.adminPostList.querySelectorAll("[data-feature]").forEach((button)=>button.addEventListener("click",()=>featurePost(button.dataset.feature)));}
-    function render(){renderHeadline();renderFilters();renderFeed();renderAdmin();}
-    async function reactToPost(postId,type){try{if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先連上 API。",true);return;}await apiFetch(`/api/posts/${postId}/reactions`,{method:"POST",body:JSON.stringify({type})});await loadPosts();}catch(error){setFlash(error.message,true);}}
-    function populateEditor(postId){const post=state.posts.find((item)=>item.id===postId);if(!post) return;els.postForm.dataset.editingId=post.id;document.getElementById("titleInput").value=post.title||"";document.getElementById("authorInput").value=post.author||"";document.getElementById("categoryInput").value=post.category||"";document.getElementById("summaryInput").value=post.summary||"";document.getElementById("contentInput").value=post.content||"";setFlash(`正在編輯：${post.title}`);window.scrollTo({top:0,behavior:"smooth"});}
-    async function featurePost(postId){try{await apiFetch(`/api/posts/${postId}/feature`,{method:"PATCH"});setFlash("已設為頭條。");await loadPosts();}catch(error){setFlash(error.message,true);}}
-    async function handleSubmit(event){event.preventDefault();const payload=Object.fromEntries(new FormData(els.postForm).entries());if(!payload.title?.trim()||!payload.content?.trim()){setFlash("標題與內文不能空白。",true);return;}if(state.sourceMode!=="live"){setFlash("目前是展示模式，請先連上 API。",true);return;}els.submitBtn.disabled=true;try{const editingId=els.postForm.dataset.editingId;if(editingId){await apiFetch(`/api/posts/${editingId}`,{method:"PATCH",body:JSON.stringify(payload)});delete els.postForm.dataset.editingId;setFlash("文章已更新。");}else{await apiFetch("/api/posts",{method:"POST",body:JSON.stringify(payload)});setFlash("文章已發佈。");}els.postForm.reset();await loadPosts();}catch(error){setFlash(error.message,true);}finally{els.submitBtn.disabled=false;}}
-    async function adminLogin(){state.adminPassword=els.adminPasswordInput.value.trim();try{await apiFetch("/api/admin/login",{method:"POST"});state.adminLoggedIn=true;localStorage.setItem("garbage-news-admin-password",state.adminPassword);setAdminStatus("管理員已登入。");await loadPosts();}catch(error){state.adminLoggedIn=false;setAdminStatus(error.message,true);}}
-    function adminLogout(){state.adminLoggedIn=false;state.adminPassword="";localStorage.removeItem("garbage-news-admin-password");els.postForm.reset();delete els.postForm.dataset.editingId;setAdminStatus("尚未登入");renderAdmin();}
-    async function clearPosts(){try{await apiFetch("/api/admin/reset",{method:"POST"});setFlash("文章已清空。");await loadPosts();}catch(error){setFlash(error.message,true);}}
-    els.postForm.addEventListener("submit",handleSubmit);els.refreshBtn.addEventListener("click",()=>loadPosts());els.adminLoginBtn.addEventListener("click",adminLogin);els.adminLogoutBtn.addEventListener("click",adminLogout);els.clearPostsBtn.addEventListener("click",clearPosts);
-    state.apiUrl=resolveApiUrl();if(state.adminPassword) els.adminPasswordInput.value=state.adminPassword;loadPosts();
+    const apiParam = new URLSearchParams(window.location.search).get("api");
+    if (apiParam) {
+      localStorage.setItem("apiBaseUrl", apiParam);
+    }
+
+    const defaultApiBase = window.location.protocol.startsWith("http")
+      ? window.location.origin
+      : "http://localhost:3000";
+
+    const API_BASE = localStorage.getItem("apiBaseUrl") || defaultApiBase;
+    const tabs = [...document.querySelectorAll(".tab")];
+    const state = {
+      token: "",
+      products: [],
+      orders: [],
+      calling: { currentPickupNumber: null, waitingPickupNumbers: [], calledPickupNumbers: [] },
+      stats: { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] }
+    };
+    const publicState = { currentPickupNumber: null, waitingPickupNumbers: [] };
+    const cart = new Map();
+
+    const $ = (id) => document.getElementById(id);
+    const api = (path) => `${API_BASE}${path}`;
+    const money = (value) => `$${Number(value || 0).toLocaleString("zh-TW")}`;
+    const time = (value) => new Date(value).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+    const authHeaders = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${state.token}` });
+
+    function setConnection(text, ok = true) {
+      const el = $("connectionStatus");
+      el.textContent = text;
+      el.style.color = ok ? "var(--ok)" : "var(--danger)";
+    }
+
+    function switchView(id) {
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === id));
+      document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === id));
+    }
+
+    function setAuthUi(isLoggedIn, message = "") {
+      $("counterGate").style.display = isLoggedIn ? "none" : "block";
+      $("counterContent").style.display = isLoggedIn ? "block" : "none";
+      $("callingControlsCard").style.display = isLoggedIn ? "block" : "none";
+      $("quickStatsCard").style.display = isLoggedIn ? "block" : "none";
+      $("kitchenGate").style.display = isLoggedIn ? "none" : "block";
+      $("kitchenContent").style.display = isLoggedIn ? "grid" : "none";
+      $("manageGate").style.display = isLoggedIn ? "none" : "block";
+      $("manageContent").style.display = isLoggedIn ? "block" : "none";
+      $("loginStateText").textContent = isLoggedIn ? "已登入" : "尚未登入";
+      $("loginMessage").textContent = message;
+      $("logoutBtn").style.display = isLoggedIn ? "inline-flex" : "none";
+      tabs.forEach((tab) => {
+        if (tab.dataset.view !== "displayView") {
+          tab.style.opacity = isLoggedIn ? "1" : "0.8";
+        }
+      });
+    }
+
+    function logout(message = "已登出") {
+      state.token = "";
+      setAuthUi(false, message);
+      renderAdmin();
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(api(path), options);
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        logout("登入已失效，請重新輸入櫃台密碼");
+      }
+      if (!response.ok) {
+        throw new Error(data.message || "操作失敗");
+      }
+      return data;
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => switchView(tab.dataset.view));
+    });
+
+    function renderPublic() {
+      $("currentPickupDisplay").textContent = publicState.currentPickupNumber || "--";
+      $("waitingCount").textContent = `${publicState.waitingPickupNumbers.length} 組`;
+      const wrap = $("waitingList");
+      wrap.innerHTML = "";
+      if (!publicState.waitingPickupNumbers.length) {
+        wrap.innerHTML = '<div class="empty">目前沒有等待中的號碼</div>';
+        return;
+      }
+
+      publicState.waitingPickupNumbers.forEach((number) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = number;
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderCalledHistory() {
+      const wrap = $("calledHistory");
+      const history = state.calling.calledPickupNumbers || [];
+      wrap.innerHTML = "";
+
+      if (!history.length) {
+        wrap.innerHTML = '<div class="empty">目前還沒有叫號紀錄</div>';
+        return;
+      }
+
+      history.forEach((number) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = number;
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderProducts() {
+      const drinkWrap = $("drinkProducts");
+      const iceWrap = $("iceProducts");
+      drinkWrap.innerHTML = "";
+      iceWrap.innerHTML = "";
+
+      state.products.forEach((product) => {
+        const qty = cart.get(product.id) || 0;
+        const card = document.createElement("div");
+        card.className = "item";
+        card.innerHTML = `<div><strong>${product.name}</strong><div class="muted">${money(product.price)}</div></div><div class="qty"><button type="button" data-op="minus">-</button><span>${qty}</span><button type="button" data-op="plus">+</button></div>`;
+
+        card.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const next = (cart.get(product.id) || 0) + (button.dataset.op === "plus" ? 1 : -1);
+            if (next <= 0) {
+              cart.delete(product.id);
+            } else {
+              cart.set(product.id, next);
+            }
+            renderProducts();
+            renderSummary();
+          });
+        });
+
+        (product.category === "drink" ? drinkWrap : iceWrap).appendChild(card);
+      });
+    }
+
+    function renderSummary() {
+      const wrap = $("orderSummary");
+      const items = state.products
+        .filter((product) => cart.has(product.id))
+        .map((product) => ({ ...product, quantity: cart.get(product.id) }));
+
+      $("summaryCount").textContent = `${items.length} 項`;
+      wrap.innerHTML = "";
+
+      if (!items.length) {
+        wrap.innerHTML = '<div class="empty">尚未加入任何商品</div>';
+        $("totalAmount").textContent = "$0";
+        return;
+      }
+
+      let total = 0;
+      items.forEach((item) => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        const row = document.createElement("div");
+        row.className = "summaryRow";
+        row.innerHTML = `<div><strong>${item.name}</strong><div class="muted">${item.category === "drink" ? "飲料" : "冰品"}</div></div><div>x ${item.quantity}</div><div>${money(subtotal)}</div>`;
+        wrap.appendChild(row);
+      });
+
+      $("totalAmount").textContent = money(total);
+    }
+
+    function statusText(status) {
+      return {
+        pending: "待製作",
+        preparing: "製作中",
+        done: "已完成",
+        cancelled: "已取消"
+      }[status] || status;
+    }
+
+    function buildKitchenCard(order, category) {
+      const items = order.items.filter((item) => item.category === category);
+      if (!items.length || order.status === "done" || order.status === "cancelled") {
+        return null;
+      }
+
+      const card = document.createElement("div");
+      card.className = "orderCard";
+      card.innerHTML = `
+        <div class="orderHead">
+          <div>
+            <div class="orderId">${order.pickupNumber || order.orderId}</div>
+            <div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div>
+          </div>
+        </div>
+        <div class="tags">
+          <span class="tag">${statusText(order.status)}</span>
+          <span class="tag">${money(order.totalAmount)}</span>
+          <span class="tag">${order.pickupNumber ? "有叫號" : "無叫號"}</span>
+        </div>
+        <div class="stack">${items.map((item) => `<div class="item"><span>${item.name}</span><strong>x ${item.quantity}</strong></div>`).join("")}</div>
+        ${order.note ? `<div class="note">${order.note}</div>` : ""}
+      `;
+
+      if (state.token) {
+        const actions = document.createElement("div");
+        actions.className = "btns";
+        actions.style.marginTop = "10px";
+        actions.innerHTML = `<button class="btn secondary" data-status="pending">待製作</button><button class="btn drink" data-status="preparing">製作中</button><button class="btn ok" data-status="done">已完成</button>`;
+
+        actions.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", async () => {
+            try {
+              await request(`/api/orders/${order.orderId}/status`, {
+                method: "PATCH",
+                headers: authHeaders(),
+                body: JSON.stringify({ status: button.dataset.status })
+              });
+              await refresh();
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+        });
+
+        card.appendChild(actions);
+      }
+
+      return card;
+    }
+
+    function renderKitchen() {
+      const drinkWrap = $("drinkOrders");
+      const iceWrap = $("iceOrders");
+      drinkWrap.innerHTML = "";
+      iceWrap.innerHTML = "";
+      let drinkCount = 0;
+      let iceCount = 0;
+
+      state.orders
+        .filter((order) => order.status !== "done" && order.status !== "cancelled")
+        .forEach((order) => {
+          const drinkCard = buildKitchenCard(order, "drink");
+          const iceCard = buildKitchenCard(order, "ice");
+
+          if (drinkCard) {
+            drinkWrap.appendChild(drinkCard);
+            drinkCount += 1;
+          }
+          if (iceCard) {
+            iceWrap.appendChild(iceCard);
+            iceCount += 1;
+          }
+        });
+
+      if (!drinkCount) {
+        drinkWrap.innerHTML = '<div class="empty">目前沒有飲料訂單</div>';
+      }
+      if (!iceCount) {
+        iceWrap.innerHTML = '<div class="empty">目前沒有冰品訂單</div>';
+      }
+
+      $("drinkOrderCount").textContent = `${drinkCount} 單`;
+      $("iceOrderCount").textContent = `${iceCount} 單`;
+    }
+
+    function renderStats() {
+      $("counterCurrentPickup").textContent = state.calling.currentPickupNumber || "--";
+      $("counterWaitingCount").textContent = String(state.calling.waitingPickupNumbers.length);
+      $("quickRevenue").textContent = money(state.stats.totalRevenue);
+      $("quickOrders").textContent = String(state.stats.totalOrders);
+      $("statRevenue").textContent = money(state.stats.totalRevenue);
+      $("statOrders").textContent = String(state.stats.totalOrders);
+      $("statPending").textContent = String(state.stats.pendingOrders);
+      $("statPreparing").textContent = String(state.stats.preparingOrders);
+      renderCalledHistory();
+    }
+
+    function renderSales() {
+      const rows = state.stats.productSales || [];
+      $("salesTableWrap").innerHTML = rows.length
+        ? `<table><thead><tr><th>商品</th><th>分類</th><th>售出數量</th><th>營收</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.name}</td><td>${row.category === "drink" ? "飲料" : "冰品"}</td><td>${row.quantity}</td><td>${money(row.revenue)}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">今天還沒有銷售紀錄</div>';
+    }
+
+    function renderOrders() {
+      $("ordersTableWrap").innerHTML = state.orders.length
+        ? `<table><thead><tr><th>訂單</th><th>品項</th><th>總價</th><th>狀態</th><th>操作</th></tr></thead><tbody>${state.orders.map((order) => `<tr><td><strong>${order.pickupNumber || order.orderId}</strong><div class="muted">${order.orderId} ・ ${time(order.createdAt)}</div></td><td>${order.items.map((item) => `${item.name} x${item.quantity}`).join("<br>")}</td><td>${money(order.totalAmount)}</td><td>${statusText(order.status)}</td><td>${order.status === "done" || order.status === "cancelled" || !state.token ? '<span class="muted">--</span>' : `<button class="btn danger" data-order-id="${order.orderId}">取消</button>`}</td></tr>`).join("")}</tbody></table>`
+        : '<div class="empty">目前沒有訂單</div>';
+
+      document.querySelectorAll("[data-order-id]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          if (!confirm("確定要取消這筆訂單嗎？")) {
+            return;
+          }
+          try {
+            await request(`/api/orders/${button.dataset.orderId}/cancel`, {
+              method: "POST",
+              headers: authHeaders()
+            });
+            await refresh();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      });
+    }
+
+    function renderAdmin() {
+      renderProducts();
+      renderSummary();
+      renderStats();
+      renderKitchen();
+      renderSales();
+      renderOrders();
+    }
+
+    async function loadPublicState() {
+      const response = await fetch(api("/api/public-state"));
+      if (!response.ok) {
+        throw new Error("無法讀取叫號資訊");
+      }
+      Object.assign(publicState, await response.json());
+      renderPublic();
+    }
+
+    async function loadAdminState() {
+      if (!state.token) {
+        state.products = [];
+        state.orders = [];
+        state.calling = { currentPickupNumber: publicState.currentPickupNumber, waitingPickupNumbers: publicState.waitingPickupNumbers, calledPickupNumbers: [] };
+        state.stats = { totalRevenue: 0, totalOrders: 0, pendingOrders: 0, preparingOrders: 0, productSales: [] };
+        renderAdmin();
+        return;
+      }
+
+      const data = await request("/api/admin-state", {
+        headers: { Authorization: `Bearer ${state.token}` }
+      });
+      state.products = data.products;
+      state.orders = data.orders;
+      state.calling = data.calling;
+      state.stats = data.stats;
+      setAuthUi(true, "登入成功，後台功能已開啟");
+      renderAdmin();
+    }
+
+    function setCallingMessage(message) {
+      $("callingMessage").textContent = message;
+    }
+
+    function setManageActionMessage(message) {
+      $("manageActionMessage").textContent = message;
+    }
+
+    async function refresh() {
+      try {
+        await loadPublicState();
+        await loadAdminState();
+        setConnection("連線正常", true);
+      } catch (error) {
+        setConnection(error.message, false);
+      }
+    }
+
+    $("loginBtn").addEventListener("click", async () => {
+      try {
+        const data = await request("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: $("passwordInput").value })
+        });
+        state.token = data.token;
+        $("passwordInput").value = "";
+        await loadAdminState();
+      } catch (error) {
+        setAuthUi(false, error.message);
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", () => logout("已登出櫃台"));
+
+    $("createOrderBtn").addEventListener("click", async () => {
+      const items = [...cart.entries()].map(([productId, quantity]) => ({ productId, quantity }));
+      if (!items.length) {
+        alert("請先加入商品");
+        return;
+      }
+
+      try {
+        await request("/api/orders", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            items,
+            note: $("orderNote").value,
+            needsPickupNumber: $("needsPickupToggle").checked
+          })
+        });
+        cart.clear();
+        $("orderNote").value = "";
+        $("needsPickupToggle").checked = false;
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("clearOrderBtn").addEventListener("click", () => {
+      cart.clear();
+      $("orderNote").value = "";
+      $("needsPickupToggle").checked = false;
+      renderProducts();
+      renderSummary();
+    });
+
+    $("callNextBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/call-next", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("recallCurrentBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/recall-current", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("clearCurrentBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/clear-current-pickup", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("resetCallingBtn").addEventListener("click", async () => {
+      try {
+        const response = await request("/api/reset-calling", { method: "POST", headers: authHeaders() });
+        setCallingMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    $("resetDailyBtn").addEventListener("click", async () => {
+      if (!confirm("確定要重設今日資料嗎？這會清空訂單、營收與叫號紀錄。")) {
+        return;
+      }
+
+      try {
+        const response = await request("/api/reset-daily", { method: "POST", headers: authHeaders() });
+        cart.clear();
+        $("orderNote").value = "";
+        $("needsPickupToggle").checked = false;
+        setCallingMessage("今日資料已重設。");
+        setManageActionMessage(response.message);
+        await refresh();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    async function init() {
+      setAuthUi(false, "請先登入櫃台密碼");
+      setCallingMessage("尚未操作叫號。");
+      setManageActionMessage("尚未執行管理操作。");
+      renderSummary();
+      renderPublic();
+      await refresh();
+      setInterval(refresh, 5000);
+    }
+
+    init();
   </script>
 </body>
 </html>

@@ -1,8 +1,5 @@
 server/.env
 server/node_modules/
-server/data/
-server/*-output.log
-server/*-error.log
 cloudflare-worker/.dev.vars
 cloudflare-worker/.wrangler/
 node_modules/
